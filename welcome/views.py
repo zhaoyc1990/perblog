@@ -20,3 +20,9 @@ def index(request):
 
 def health(request):
     return HttpResponse(PageView.objects.count())
+
+def temp(request):
+
+    return render(request, 'temp.html',{
+        'count': PageView.objects.count()
+    })
