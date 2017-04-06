@@ -3492,7 +3492,6 @@
 				padding-left: 2rem;
 				padding-right: 2rem;
 			}
-
 		}
 
 		@media screen and (min-aspect-ratio: 16 / 7) {
@@ -3524,6 +3523,10 @@
 
 		#page-wrapper {
 			padding: 0;
+		}
+		/*下面为赵  后来新添加内容*/
+		#head>nav>ul {
+			padding-left:3%;
 		}
 
 	}
