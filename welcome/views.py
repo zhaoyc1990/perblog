@@ -47,7 +47,7 @@ def save_file(path, file_name, data):
     if data == None:
             return
     mkdir(path)
-    if(not path.enswith("/")):
+    if(not path.endswith("/")):
         path = path + "/"
     file = open(path + file_name, "wb")
     file.write(data)
@@ -56,7 +56,7 @@ def save_file(path, file_name, data):
 def uploadImg(request):
     if request.method == 'POST':
         file_obj = open("log.txt", "w+")
-        buf = request.FILES.get('file', None)
+        buf = request.FILES.get('imgFile', None)
         print >> file_obj, str(buf)
         file_buff = buf.read()
         time_format = str(time.strftime("%Y-%m-%d-%H%M%S", time.localtime()))
@@ -64,5 +64,5 @@ def uploadImg(request):
         save_file("welcome/static/article/images", file_name, file_buff)
         dict_tmp = {}
         dict_tmp['error'] = 0
-        dict_tmp['url'] = '/static/image/' + file_name
+        dict_tmp['url'] = '/static/article/images/' + file_name
         return HttpResponse(json.dumps(dict_tmp))
