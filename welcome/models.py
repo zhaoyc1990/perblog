@@ -39,9 +39,12 @@ class ArticleCategory(models.Model):
 class Article(models.Model):
 	category = models.ForeignKey(ArticleCategory,related_name='articale',verbose_name='文章类别')
 	title = models.CharField('文章名称', max_length=100)
+	tags = models.CharField('文章标签', max_length=120, null=True, blank=True)
+	abstract = models.CharField('摘要', max_length=300,blank=True, null=True)
 	content = models.TextField('文章内容', default=None)
-	img  = models.ImageField('文章可观性图片', upload_to='static/article/Thumbnails', default='static/article/Thumbnails/no-img.jpg')
+	img  = models.ImageField('文章可观性图片', upload_to='static/article/Thumbnails/', default='static/article/Thumbnails/no-img.jpg')
 	pageviews = models.IntegerField('文章浏览量', default=0)
+	likes = models.PositiveIntegerField('点赞数', default=0)
 	isstick   = models.IntegerField('是否顶置',default=0) #0为普通, 1为置顶
 	stickposition = models.IntegerField('置顶位置',default=0) #以十的余数,最多十个置顶
 	timemodify = models.DateTimeField(auto_now=True)  # 修改时间

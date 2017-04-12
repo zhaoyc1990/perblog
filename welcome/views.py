@@ -5,7 +5,7 @@ from django.conf import settings
 from django.http import HttpResponse
 
 from . import database
-from .models import PageView, Announcement
+from .models import PageView, Announcement, Article
 # Create your views here.
 
 def index(request):
@@ -30,10 +30,11 @@ def temp(request):
 def home(request):
 	#网站公告
     announcement = Announcement.objects.all()
-
+    articles = Article.objects.all()
     return render(request, 'home.html',{
 		'count': "222",
-        'announcement': announcement
+        'announcement': announcement,
+        'articles': articles
 	})
 
 def mkdir(path):

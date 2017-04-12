@@ -111,5 +111,5 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_ROOT = 'static/article/Thumbnails/'
-MEDIA_URL = '/webhost_media/'
+MEDIA_ROOT = 'welcome/'
+MEDIA_URL = '/static/article/Thumbnails/'
