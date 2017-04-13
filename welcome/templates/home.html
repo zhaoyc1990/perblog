@@ -40,16 +40,17 @@
             <!-- 导航菜单 -->
             <ul class="layui-nav" lay-filter="nav">
                 <li class="layui-nav-item layui-this">
-                    <a href="home.html"><i class="fa fa-home fa-fw"></i>&nbsp;网站首页</a>
+                    <a href="/#"><i class="fa fa-home fa-fw"></i>&nbsp;网站首页</a>
                 </li>
                 <li class="layui-nav-item">
                     <a href="article.html"><i class="fa fa-file-text fa-fw"></i>&nbsp;文章专栏</a>
                 </li>
                 <li class="layui-nav-item">
-                    <a href="resource.html"><i class="fa fa-tags fa-fw"></i>&nbsp;资源分享</a>
+                     <a href="javascript:void(0);" onclick="showmsg()"><i class="fa fa-tags fa-fw"></i>&nbsp;资源分享</a>
+                    <!--<a href="resource.html"><i class="fa fa-tags fa-fw"></i>&nbsp;资源分享</a>-->
                 </li>
                 <li class="layui-nav-item">
-                    <a href="timeline.html"><i class="fa fa-hourglass-half fa-fw"></i>&nbsp;点点滴滴</a>
+                    <a href="/timeline.html"><i class="fa fa-hourglass-half fa-fw"></i>&nbsp;点点滴滴</a>
                 </li>
                 <li class="layui-nav-item">
                     <a href="about.html"><i class="fa fa-info fa-fw"></i>&nbsp;关于本站</a>
@@ -81,9 +82,8 @@
                 </div>
                 <!--左边文章列表-->
                 <div class="blog-main-left">
-                    {% for article in articles %}
 
-
+                    {% for article in topart %}<!--顶置文章-->
                         <div class="article shadow">
                             <div class="article-left">
                                 <img src="/{{ MEDIA_URL }}{{ article.img }}" alt="{{ article.title }}" />
@@ -102,7 +102,32 @@
                                 <span class="article-author"><i class="fa fa-user"></i>&nbsp;&nbsp;赵彦昌</span>
                                 <span><i class="fa fa-tag"></i>&nbsp;&nbsp;<a href="#">{{ article.category.name }}</a></span>
                                 <span class="article-viewinfo"><i class="fa fa-eye"></i>&nbsp;{{ article.pageviews }}</span>
-                                <span class="article-viewinfo"><i class="fa fa-commenting"></i>&nbsp;{{ article.artrely_set.count }}</span>
+                                <span class="article-viewinfo"><i class="fa fa-commenting"></i>&nbsp;{{ article.relycount }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    {% for article in articles %}
+                        <!--普通文章-->
+                        <div class="article shadow">
+                            <div class="article-left">
+                                <img src="/{{ MEDIA_URL }}{{ article.img }}" alt="{{ article.title }}" />
+                            </div>
+                            <div class="article-right">
+                                <div class="article-title">
+                                    <a href="detail.html">{{ article.title }}</a>
+                                </div>
+                                <div class="article-abstract">
+                                    {{ article.abstract }}
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                            <div class="article-footer">
+                                <span><i class="fa fa-clock-o"></i>&nbsp;&nbsp;{{ article.timemodify }}</span>
+                                <span class="article-author"><i class="fa fa-user"></i>&nbsp;&nbsp;赵彦昌</span>
+                                <span><i class="fa fa-tag"></i>&nbsp;&nbsp;<a href="#">{{ article.category.name }}</a></span>
+                                <span class="article-viewinfo"><i class="fa fa-eye"></i>&nbsp;{{ article.pageviews }}</span>
+                                <span class="article-viewinfo"><i class="fa fa-commenting"></i>&nbsp;{{ article.relycount }}</span>
                             </div>
                         </div>
                     {% endfor %}
@@ -275,6 +300,9 @@
                     <div class="blog-module shadow">
                         <div class="blog-module-title">热文排行</div>
                         <ul class="fa-ul blog-module-ul">
+                            {% for article in hot_art %}
+                                <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail-{{ article.id }}.html">{{ article.title }}</a></li>
+                            {% endfor %}
                             <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">Web安全之跨站请求伪造CSRF</a></li>
                             <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">ASP.NET MVC 防范跨站请求伪造（CSRF）</a></li>
                             <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">常用正则表达式</a></li>
@@ -285,6 +313,7 @@
                             <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">一步步制作时光轴（二）（CSS篇）</a></li>
                         </ul>
                     </div>
+                <!--
                     <div class="blog-module shadow">
                         <div class="blog-module-title">最近分享</div>
                         <ul class="fa-ul blog-module-ul">
@@ -294,6 +323,7 @@
                             <li><i class="fa-li fa fa-hand-o-right"></i><a href="https://pan.baidu.com/s/1nuAKF81" target="_blank">图片轮播</a></li>
                         </ul>
                     </div>
+                -->
                     <div class="blog-module shadow">
                         <div class="blog-module-title">一路走来</div>
                         <dl class="footprint">
@@ -344,7 +374,8 @@
             <a href="article.html"><i class="fa fa-file-text fa-fw"></i>&nbsp;文章专栏</a>
         </li>
         <li class="layui-nav-item">
-            <a href="resource.html"><i class="fa fa-tags fa-fw"></i>&nbsp;资源分享</a>
+            <a href="javascript:void(0);" onclick="showmsg()"><i class="fa fa-tags fa-fw"></i>&nbsp;资源分享</a>
+            <!--<a href="resource.html"><i class="fa fa-tags fa-fw"></i>&nbsp;资源分享</a>-->
         </li>
         <li class="layui-nav-item">
             <a href="timeline.html"><i class="fa fa-road fa-fw"></i>&nbsp;点点滴滴</a>
@@ -375,4 +406,9 @@
     <!-- 本页脚本 -->
     <script src="/static/js/home.js"></script>
 </body>
+<script>
+    function showmsg() {
+         layer.msg("正在建设中");
+    }
+</script>
 </html>

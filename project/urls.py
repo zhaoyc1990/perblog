@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from welcome.views import index, health, temp, home, uploadImg
+from welcome.views import index, health, temp, home, uploadImg, timeline
 import settings
 from django.conf.urls.static import static
 
@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^health$', health),
     url(r'^temp$', temp),
 	url(r'^home', home),
+    url(r'^timeline.html', timeline),
     url(r'^kin/uploadImg/$', uploadImg),
     url(r'^admin/', include(admin.site.urls)),
 ]

@@ -1,8 +1,8 @@
 # coding:utf-8
 from django.contrib import admin
 
-from .models import PageView, GuestBook, Announcement, Article, ArticleCategory
-
+from .models import PageView, GuestBook, Announcement, Article, ArticleCategory, ArticleRely, AccessBy
+from .models import TimeLine
 # Register your models here.
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
@@ -23,3 +23,6 @@ admin.site.register(GuestBook)
 admin.site.register(Announcement)
 #admin.site.register(Article, ArticleAdmin)
 admin.site.register(ArticleCategory)
+admin.site.register(ArticleRely)
+admin.site.register(AccessBy)
+admin.site.register(TimeLine)
