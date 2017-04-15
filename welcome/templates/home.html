@@ -86,7 +86,7 @@
                     {% for article in topart %}<!--顶置文章-->
                         <div class="article shadow">
                             <div class="article-left">
-                                <img src="/{{ MEDIA_URL }}{{ article.img }}" alt="{{ article.title }}" />
+                                <img src="/{{ MEDIA_URL }}{{ article.img.url_138x53 }}" alt="{{ article.title }}" />
                             </div>
                             <div class="article-right">
                                 <div class="article-title">

@@ -95,7 +95,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'CST'
+TIME_ZONE = 'CST6CDT'
 
 USE_I18N = True
 
@@ -112,4 +112,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_ROOT = 'welcome/'
-MEDIA_URL = '/static/article/Thumbnails/'
+MEDIA_URL = '/'

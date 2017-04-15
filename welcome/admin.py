@@ -6,7 +6,7 @@ from .models import TimeLine
 # Register your models here.
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('title',)
+    list_display = ('title','pageviews')
     class Media:
         # 在管理后台的HTML文件中加入js文件, 每一个路径都会追加STATIC_URL/
         js = (

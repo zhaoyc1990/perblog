@@ -1,6 +1,7 @@
 # coding=utf-8
 from django.db import models
-import time
+from django_thumbs.db.models import ImageWithThumbsField
+import time, os, datetime, uuid
 # Create your models here.
 
 class PageView(models.Model):
@@ -37,13 +38,25 @@ class ArticleCategory(models.Model):
 	def __str__(self):
 		return self.name
 
+#文章简介缩略图路径
+def generate_filename(instance, filename):
+	"""
+	安全考虑，生成随机文件名
+	:param instance:
+	:param filename:
+	:return:
+	"""
+	directory_name = datetime.datetime.now().strftime('static/article/Thumbnails/%Y/%m/%d')
+	filename = uuid.uuid4().hex + os.path.splitext(filename)[-1]
+	return os.path.join(directory_name, filename)
+
 class Article(models.Model):
 	category = models.ForeignKey(ArticleCategory,related_name='articale',verbose_name='文章类别')
 	title = models.CharField('文章名称', max_length=100)
 	tags = models.CharField('文章标签', max_length=120, null=True, blank=True)
 	abstract = models.CharField('摘要', max_length=300,blank=True, null=True)
 	content = models.TextField('文章内容', default=None)
-	img  = models.ImageField('文章可观性图片', upload_to='static/article/Thumbnails/', default='static/article/Thumbnails/no-img.jpg')
+	img  = ImageWithThumbsField('文章可观性图片', upload_to=generate_filename, default='static/article/Thumbnails/no-img.jpg', sizes=((138,53),))
 	pageviews = models.IntegerField('文章浏览量', default=0)
 	likes = models.PositiveIntegerField('点赞数', default=0)
 	relycount = models.PositiveIntegerField('回复量', default=0) #临时字段不需要数据库操作
@@ -55,6 +68,8 @@ class Article(models.Model):
 		return self.title
 	def __str__(self):
 		return self.title
+	class Meta:
+		verbose_name_plural = verbose_name = '文章'
 
 class AccessBy(models.Model):
 	ip = models.GenericIPAddressField('访问者ip')
