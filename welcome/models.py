@@ -109,3 +109,21 @@ class TimeLine(models.Model):
 		self.year = time.strftime('%Y', time.localtime(time.time()))
 		self.month = time.strftime('%m', time.localtime(time.time()))
 		super(TimeLine, self).save(*args, **kwargs)
+
+class protagonist:
+	protagonist_sex = (
+		(0,'女'),
+		(1,'男'),
+	)
+
+	name = models.CharField('姓名',max_length=20)
+	photo = ImageWithThumbsField('头像',upload_to=generate_filename, default='static/article/Thumbnails/no-img.jpg', sizes=((100,100),))
+	sex = models.IntegerField(choices=protagonist_sex, verbose_name='性别', null=True)
+	career = models.CharField('职业', max_length=30)
+	location = models.CharField('地理位置', max_length=100, help_text='省-市')
+	githubnum = models.CharField('github.com帐号', max_length=100, blank=True, null=True)
+	qqnum = models.CharField('QQ帐号', max_length=20, blank=True, null=True)
+	sinanum = models.CharField('新浪微博帐号', max_length=50, blank=True,null=True)
+	twitter = models.CharField('twitter帐号', max_length=50, blank=True, null=True)
+	selfinfo = models.TextField('个人介绍')
+
