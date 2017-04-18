@@ -83,10 +83,10 @@
                         {% for line in timelines %}
                         <div class="timeline-year">
                             <h2><a class="yearToggle" href="javascript:;">{{ line.0.year }}年</a><i class="fa fa-caret-down fa-fw"></i></h2>
-                                <div class="timeline-month">
+                            <div class="timeline-month">
+                               <!-- <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:;">2月</a><i class="fa fa-caret-down fa-fw"></i></h3>-->
                                 <ul>
                                     {% for li in line %}
-
                                     <li class=" ">
                                         <div class="h4  animated fadeInLeft">
                                             <p class="date">{{ li.timestamp }}</p>
@@ -97,9 +97,8 @@
 
                                     </li>
                                     {% endfor %}
-
                                 </ul>
-                                </div>
+                            </div>
                         </div>
                         {% endfor %}
                         <!--

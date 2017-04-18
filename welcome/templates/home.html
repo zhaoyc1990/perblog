@@ -86,7 +86,7 @@
                     {% for article in topart %}<!--顶置文章-->
                         <div class="article shadow">
                             <div class="article-left">
-                                <img src="/{{ MEDIA_URL }}{{ article.img }}" alt="{{ article.title }}" />
+                                <img src="/{{ MEDIA_URL }}{{ article.img.url_138x53 }}" alt="{{ article.title }}" />
                             </div>
                             <div class="article-right">
                                 <div class="article-title">
@@ -111,7 +111,7 @@
                         <!--普通文章-->
                         <div class="article shadow">
                             <div class="article-left">
-                                <img src="/{{ MEDIA_URL }}{{ article.img }}" alt="{{ article.title }}" />
+                                <img src="{{ MEDIA_URL }}{{ article.img.url_138x53 }}" alt="{{ article.title }}" />
                             </div>
                             <div class="article-right">
                                 <div class="article-title">
@@ -363,7 +363,7 @@
     <!-- 底部 -->
     <footer class="blog-footer">
         <p><span>Copyright</span><span>&copy;</span><span>2017</span><a href="http://www.zhaoyanchang.com">赵彦昌博客</a><span>Design By LY</span></p>
-        <p><a href="#" target="_blank"></a></p>
+        <p><a href="http://www.miibeian.gov.cn/" target="_blank"></a></p>
     </footer>
     <!--侧边导航-->
     <ul class="layui-nav layui-nav-tree layui-nav-side blog-nav-left layui-hide" lay-filter="nav">
