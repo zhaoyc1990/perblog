@@ -47,6 +47,11 @@ layui.use(['element', 'layer', 'util', 'form'], function () {
             leftOut();
         }
     });
+    //正在建设中消息
+    $('.construction').click(function () {
+       layer.msg('正在建设中,敬请期待...')
+    });
+
     //侧边导航遮罩点击事件
     $('.blog-mask').click(function () {
         leftOut();

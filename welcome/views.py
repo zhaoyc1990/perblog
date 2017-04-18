@@ -53,10 +53,11 @@ def home(request):
 
 def timeline(request):
     year = 2017
+    nowyear = int(time.strftime('%Y', time.localtime(time.time())))
     timelines = []
-    while (year >= 2017):
+    while (year <= nowyear):
         timelines.append(list(TimeLine.objects.filter(year=year)))
-        year = year - 1
+        nowyear = nowyear - 1
     return render(request, 'timeline.html', {
         'timelines':timelines
     })
