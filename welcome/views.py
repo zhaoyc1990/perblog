@@ -73,6 +73,11 @@ def home(request):
 	})
 
 def timeline(request):
+    # 网站信息
+    websiteinfo = None
+    websiteinfo_num = Websiteinfo.objects.count()
+    if websiteinfo_num > 0:
+        websiteinfo = Websiteinfo.objects.get()
     year = 2017
     nowyear = int(time.strftime('%Y', time.localtime(time.time())))
     timelines = []
@@ -80,7 +85,8 @@ def timeline(request):
         timelines.append(list(TimeLine.objects.filter(year=year)))
         nowyear = nowyear - 1
     return render(request, 'timeline.html', {
-        'timelines':timelines
+        'timelines':timelines,
+        'websiteinfo': websiteinfo,
     })
 
 
