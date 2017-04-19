@@ -19,6 +19,8 @@ class GuestBook(models.Model):
 		return self.__str__
 	def __str__(self):
 		return self.name
+	class Meta:
+		verbose_name_plural = verbose_name = '网站留言'
 
 class Announcement(models.Model):
 	content = models.CharField('网站公告', max_length=100)
@@ -37,6 +39,8 @@ class ArticleCategory(models.Model):
 		return self.name
 	def __str__(self):
 		return self.name
+	class Meta:
+		verbose_name_plural = verbose_name = '文章类别'
 
 #文章简介缩略图路径
 def generate_filename(instance, filename):
@@ -90,6 +94,8 @@ class ArticleRely(models.Model):
 		return self.name
 	def __str__(self):
 		return self.name
+	class Meta:
+		verbose_name_plural = verbose_name = '文章评论及评论回复'
 
 #时光线
 class TimeLine(models.Model):
@@ -109,8 +115,11 @@ class TimeLine(models.Model):
 		self.year = time.strftime('%Y', time.localtime(time.time()))
 		self.month = time.strftime('%m', time.localtime(time.time()))
 		super(TimeLine, self).save(*args, **kwargs)
+	class Meta:
+		verbose_name_plural = verbose_name = '时光线'
 
-class protagonist:
+#博主信息
+class Protagonist(models.Model):
 	protagonist_sex = (
 		(0,'女'),
 		(1,'男'),
@@ -122,8 +131,38 @@ class protagonist:
 	career = models.CharField('职业', max_length=30)
 	location = models.CharField('地理位置', max_length=100, help_text='省-市')
 	githubnum = models.CharField('github.com帐号', max_length=100, blank=True, null=True)
+	email = models.EmailField('邮箱地址', max_length=100, blank=True, null=True),
 	qqnum = models.CharField('QQ帐号', max_length=20, blank=True, null=True)
 	sinanum = models.CharField('新浪微博帐号', max_length=50, blank=True,null=True)
 	twitter = models.CharField('twitter帐号', max_length=50, blank=True, null=True)
 	selfinfo = models.TextField('个人介绍')
+	def __unicode__(self):
+		return self.name
+	def __str__(self):
+		return self.name
+	class Meta:
+		verbose_name_plural = verbose_name = '博主信息'
 
+#网站信息
+class Websiteinfo(models.Model):
+	title = models.CharField('网站名称', max_length=200)
+	info = models.CharField('网站简介', max_length=200, blank=True, null=True)
+	photo = ImageWithThumbsField('网站图标', upload_to=generate_filename, sizes=((40,40),) )
+	casenum = models.CharField('备案号', max_length=50, help_text='没有，不写', blank=True, null=True)
+	bottom = models.TextField('底部', default='Copyright©2017赵彦昌博客Design By LY')
+	def __unicode__(self):
+		return self.title
+	def __str__(self):
+		return self.title
+	class Meta:
+		verbose_name_plural = verbose_name = '网站信息'
+
+class Links(models.Model):
+	title = models.CharField('名字', max_length=50)
+	link = models.CharField('超连接', max_length=100)
+	def __unicode__(self):
+		return self.name
+	def __str__(self):
+		return self.name
+	class Meta:
+		verbose_name_plural = verbose_name = '友情链接'

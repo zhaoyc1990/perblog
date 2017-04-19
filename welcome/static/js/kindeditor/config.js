@@ -5,7 +5,6 @@ KindEditor.ready(function(K){
      KK = K;
 });
 function searchtoken() {
-    console.log("sdf");
     if (csrfitems.length > 0) {
         csrftoken = csrfitems[0].value;
         clearInterval(_interval);

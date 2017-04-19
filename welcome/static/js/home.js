@@ -5,7 +5,8 @@
 @Site：http://www.lyblogs.cn
 
 */
-
+var csrfitems = document.getElementsByName("csrfmiddlewaretoken");
+var csrftoken = csrfitems[0].value;
 
 layui.use(['jquery', 'flow'], function () {
     var $ = layui.jquery;
@@ -26,9 +27,9 @@ layui.use(['jquery', 'flow'], function () {
             }
             $.ajax({
                 type: 'post',
-                url: '/api/article/GetArticlesByFlow',
+                url: '/api/article/next',
                 contentType: 'application/json',
-                data: JSON.stringify({ "currentIndex": page, "pageSize": 10, "type": 1 }),
+                data: JSON.stringify({ "currentIndex": page, "pageSize": 1, "type": 1 }),
                 datatype: 'json',
                 success: function (res) {
                     if (res.Success) {
@@ -38,6 +39,9 @@ layui.use(['jquery', 'flow'], function () {
                     } else {
                         layer.msg('获取数据失败', { icon: 2 });
                     }
+                },
+                beforeSend: function(xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 },
                 error: function (e) {
                     layer.msg(e.responseText);

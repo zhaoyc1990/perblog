@@ -13,7 +13,7 @@
     <meta http-equiv="Content-Type" content="text/html; Charset=gb2312">
     <meta http-equiv="Content-Language" content="zh-CN">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <title>赵彦昌博客--喜欢思考的IT运维人的技术及生活记录</title>
+    <title>{{ websiteinfo.title }}--{{ websiteinfo.info }}</title>
     <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon">
     <!--Layui-->
     <link href="/static/plug/layui/css/layui.css" rel="stylesheet" />
@@ -25,6 +25,7 @@
     <link href="/static/css/home.css" rel="stylesheet" />
 </head>
 <body>
+    {% csrf_token %}
     <!-- 导航 -->
     <nav class="blog-nav layui-header">
         <div class="blog-container">
@@ -36,7 +37,7 @@
                 <img src="/static/images/Absolutely.jpg" alt="Absolutely" title="Absolutely" />
             </a>
             <!-- 建设中 -->
-            <a class="blog-logo" href="home.html">建设中</a>
+            <a class="blog-logo" href="home.html">{{ websiteinfo.title}}</a>
             <!-- 导航菜单 -->
             <ul class="layui-nav" lay-filter="nav">
                 <li class="layui-nav-item layui-this">
@@ -86,11 +87,11 @@
                     {% for article in topart %}<!--顶置文章-->
                         <div class="article shadow">
                             <div class="article-left">
-                                <img src="/{{ MEDIA_URL }}{{ article.img.url_138x53 }}" alt="{{ article.title }}" />
+                                <img src="{{ MEDIA_URL }}{{ article.img.url_138x53 }}" alt="{{ article.title }}" />
                             </div>
                             <div class="article-right">
                                 <div class="article-title">
-                                    <a href="detail.html">{{ article.title }}</a>
+                                    <a href="/detail/{{ article.id }}.html">{{ article.title }}</a>
                                 </div>
                                 <div class="article-abstract">
                                     {{ article.abstract }}
@@ -115,7 +116,7 @@
                             </div>
                             <div class="article-right">
                                 <div class="article-title">
-                                    <a href="detail.html">{{ article.title }}</a>
+                                    <a href="/detail/{{ article.id }}.html">{{ article.title }}</a>
                                 </div>
                                 <div class="article-abstract">
                                     {{ article.abstract }}
@@ -283,17 +284,17 @@
                 <div class="blog-main-right">
                     <div class="blogerinfo shadow">
                         <div class="blogerinfo-figure">
-                            <img src="/static/images/Absolutely.jpg" alt="Absolutely" />
+                            <img src="{{ MEDIA_URL }}{{ protagonist.photo.url_100x100 }}" alt="我的头像" />
                         </div>
-                        <p class="blogerinfo-nickname">Absolutely</p>
-                        <p class="blogerinfo-introduce">一枚90后程序员，.NET开发工程师</p>
-                        <p class="blogerinfo-location"><i class="fa fa-location-arrow"></i>&nbsp;四川 - 成都</p>
+                        <p class="blogerinfo-nickname">{{ protagonist.name }}</p>
+                        <p class="blogerinfo-introduce">{{ protagonist.selfinfo }}</p>
+                        <p class="blogerinfo-location"><i class="fa fa-location-arrow"></i>&nbsp;{{ protagonist.location }}</p>
                         <hr />
                         <div class="blogerinfo-contact">
-                            <a target="_blank" title="QQ交流" href="javascript:layer.msg('启动QQ会话窗口')"><i class="fa fa-qq fa-2x"></i></a>
-                            <a target="_blank" title="给我写信" href="javascript:layer.msg('启动邮我窗口')"><i class="fa fa-envelope fa-2x"></i></a>
-                            <a target="_blank" title="新浪微博" href="javascript:layer.msg('转到你的微博主页')"><i class="fa fa-weibo fa-2x"></i></a>
-                            <a target="_blank" title="码云" href="javascript:layer.msg('转到你的github主页')"><i class="fa fa-git fa-2x"></i></a>
+                            <a target="_blank" title="QQ交流" href="javascript:layer.msg('暂时未开通')"><i class="fa fa-qq fa-2x"></i></a>
+                            <a target="_blank" title="给我写信" href="javascript:layer.msg('暂时未开通')"><i class="fa fa-envelope fa-2x"></i></a>
+                            <a target="_blank" title="新浪微博" href="javascript:layer.msg('暂时未开通')"><i class="fa fa-weibo fa-2x"></i></a>
+                            <a target="_blank" title="码云" href="https://github.com/{{ protagonist.githubnum }}"><i class="fa fa-git fa-2x"></i></a>
                         </div>
                     </div>
                     <div></div><!--占位-->
@@ -327,16 +328,14 @@
                     <div class="blog-module shadow">
                         <div class="blog-module-title">一路走来</div>
                         <dl class="footprint">
-                            <dt>2017年03月12日</dt>
-                            <dd>新增留言回复功能！人人都可参与回复！</dd>
-                            <dt>2017年03月10日</dt>
-                            <dd>不落阁2.0基本功能完成，正式上线！</dd>
-                            <dt>2017年03月09日</dt>
-                            <dd>新增文章搜索功能！</dd>
-                            <dt>2017年02月25日</dt>
-                            <dd>QQ互联接入网站，可QQ登陆发表评论与留言！</dd>
+                            {% for time in timeline %}
+                                <!--django 时间格式化-->
+                            <dt>{{ time.timestamp | date:"Y年m月d日" }}</dt>
+                            <dd>{{ time.content }}</dd>
+                            {% endfor %}
                         </dl>
                     </div>
+                <!-- 加广告
                     <div class="blog-module shadow">
                         <div class="blog-module-title">后台记录</div>
                         <dl class="footprint">
@@ -348,11 +347,13 @@
                             <dd>新增Win10快捷菜单</dd>
                         </dl>
                     </div>
+                -->
                     <div class="blog-module shadow">
                         <div class="blog-module-title">友情链接</div>
                         <ul class="blogroll">
-                            <li><a target="_blank" href="http://www.layui.com/" title="Layui">Layui</a></li>
-                            <li><a target="_blank" href="http://www.pagemark.cn/" title="页签">页签</a></li>
+                            {% for link in links %}
+                            <li><a target="_blank" href="{{ link.link }}" title="{{ link.title }}">{{ link.title }}</a></li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>
