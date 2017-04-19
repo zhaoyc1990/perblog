@@ -87,7 +87,7 @@
                     {% for article in topart %}<!--顶置文章-->
                         <div class="article shadow">
                             <div class="article-left">
-                                <img src="{{ MEDIA_URL }}{{ article.img.url_138x53 }}" alt="{{ article.title }}" />
+                                <img src="{{ article.webimg }}" alt="{{ article.title }}" />
                             </div>
                             <div class="article-right">
                                 <div class="article-title">
@@ -112,7 +112,7 @@
                         <!--普通文章-->
                         <div class="article shadow">
                             <div class="article-left">
-                                <img src="{{ MEDIA_URL }}{{ article.img.url_138x53 }}" alt="{{ article.title }}" />
+                                <img src="{{ article.webimg }}" alt="{{ article.title }}" />
                             </div>
                             <div class="article-right">
                                 <div class="article-title">
@@ -137,7 +137,7 @@
                 <div class="blog-main-right">
                     <div class="blogerinfo shadow">
                         <div class="blogerinfo-figure">
-                            <img src="{{ MEDIA_URL }}{{ protagonist.photo.url_100x100 }}" alt="我的头像" />
+                            <img src="{{ protagonist.webimg }}" alt="我的头像" />
                         </div>
                         <p class="blogerinfo-nickname">{{ protagonist.name }}</p>
                         <p class="blogerinfo-introduce">{{ protagonist.selfinfo }}</p>
