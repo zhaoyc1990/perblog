@@ -161,8 +161,8 @@ class Links(models.Model):
 	title = models.CharField('名字', max_length=50)
 	link = models.CharField('超连接', max_length=100)
 	def __unicode__(self):
-		return self.name
+		return self.title
 	def __str__(self):
-		return self.name
+		return self.title
 	class Meta:
 		verbose_name_plural = verbose_name = '友情链接'
