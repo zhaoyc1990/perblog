@@ -61,6 +61,7 @@ class Article(models.Model):
 	abstract = models.CharField('摘要', max_length=300,blank=True, null=True)
 	content = models.TextField('文章内容', default=None)
 	img  = ImageWithThumbsField('文章可观性图片', upload_to=generate_filename, default='static/article/Thumbnails/no-img.jpg', sizes=((138,53),))
+	webimg = models.CharField('网络图片用于文章可观性图片', max_length=200, default='/static/article/Thumbnails/no-img.jpg')
 	pageviews = models.IntegerField('文章浏览量', default=0)
 	likes = models.PositiveIntegerField('点赞数', default=0)
 	relycount = models.PositiveIntegerField('回复量', default=0) #临时字段不需要数据库操作
@@ -127,6 +128,7 @@ class Protagonist(models.Model):
 
 	name = models.CharField('姓名',max_length=20)
 	photo = ImageWithThumbsField('头像',upload_to=generate_filename, default='static/article/Thumbnails/no-img.jpg', sizes=((100,100),))
+	webimg = models.CharField('网络图片头像', max_length=200, default='/static/article/Thumbnails/no-img.jpg')
 	sex = models.IntegerField(choices=protagonist_sex, verbose_name='性别', null=True)
 	career = models.CharField('职业', max_length=30)
 	location = models.CharField('地理位置', max_length=100, help_text='省-市')
