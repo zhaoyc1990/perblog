@@ -59,7 +59,8 @@ def home(request):
     #普通文章按时间顺序
     articles = Article.objects.filter(isstick=0)
     for art in articles:
-        print art.artrely.count()
+        print ArticleRely.objects.filter(artid_id=art.id).count()
+        # print art.artrely.count()
         art.relycount = art.artrely.count()
     return render(request, 'home.html',{
         'announcement': announcement,
@@ -136,6 +137,7 @@ def detail(request, aid):
         request.session['art' + str(art.id) + 'dir'] = int(time.time())
     else:
         print '有COOKIE',isread
+        request.session['art' + str(art.id) + 'dir'] = int(time.time())
     return render(request, 'detail.html',{
         'count': PageView.objects.count(),
         'art': art,
@@ -162,9 +164,7 @@ def homenext(request):
             end = currentIndex*7 +1
         print "currentIndex", currentIndex
         art = Article.objects.filter(isstick=0)[start:end]
-        print "asdf"
         art_count = Article.objects.count()
-        print "dddd"
         response_data = {}
         response_data['Data'] = articlecode(art)
         response_data['Success'] = True

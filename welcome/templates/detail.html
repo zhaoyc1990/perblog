@@ -112,7 +112,7 @@
                             <li>
                                 {% for art_ry in art_rely %}
                                 <div class="comment-parent">
-                                    <img src="/static/article/Thumbnails/no-img.jpg" alt="absolutely" />
+                                    <img src="{{ art_ry.photo }}" alt="absolutely" />
                                     <div class="info">
                                         <span class="username">{{ art_ry.name }}</span>
                                         <span class="time">{{ art_ry.timemodify }}</span>
@@ -162,7 +162,7 @@
     </div>
     <!-- 底部 -->
     <footer class="blog-footer">
-        <p><span>Copyright</span><span>&copy;</span><span>2017</span><a href="http://www.lyblogs.cn">{{ websiteinfo.title }}</a><span>{{ websiteinfo.bottom }}</span></p>
+        <p><span>Copyright</span><span>&copy;</span><span>2017</span><a href="www.zhaoyanchang.com">{{ websiteinfo.title }}</a><span>{{ websiteinfo.bottom }}</span></p>
         <p><a href="http://www.miibeian.gov.cn/" target="_blank">{{ websiteinfo.casenum }}</a></p>
     </footer>
     <!--侧边导航-->

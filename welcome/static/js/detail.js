@@ -40,7 +40,7 @@ layui.use(['form', 'layedit'], function () {
             datatype: 'json',
             success: function (res) {
                 if (res.Success) {
-                    formadd(index, res.data, res.avatar, res.name, res.time)
+                    formadd(index, data.field.editorContent, res.avatar, res.name, res.time)
                 } else {
                     layer.msg('评论失败', { icon: 2 });
                 }
