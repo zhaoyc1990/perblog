@@ -34,6 +34,7 @@
         </style>
 	</head>
 	<body>
+    {% csrf_token %}
                                                 <div id="head">
         <nav>
             <ul class="navigation">
@@ -173,9 +174,42 @@
 		<!-- Scripts -->
 			<script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
 			<!-- Scripts<script src="/static/assets/js/jquery.min.js"></script> -->
-			<script src="/static/assets/js/skel.min.js"></script>
+            <script src="http://cdn.bootcss.com/skel/3.0.1/skel.min.js"></script>
+			<!--<script src="/static/assets/js/skel.min.js"></script> 上面已添加又拍去CDN-->
 			<script src="/static/assets/js/main.js"></script>
+            <script src="http://cdn.bootcss.com/layer/3.0.1/layer.min.js"></script>
     <script>
+        var csrfitems = document.getElementsByName("csrfmiddlewaretoken");
+        var csrftoken = csrfitems[0].value;
+        $(".button").click(function(){
+            var email = $("input[name='email']").val();
+            var message = $("textarea[name='message']").val();
+            var name = $("input[name='name']").val();
+            $.ajax({
+                type: 'post',
+                url: '/api/message',
+                contentType: 'application/json',
+                data: JSON.stringify({ "content": message, "name": name, "email": email}),
+                datatype: 'json',
+                success: function (res) {
+                    if (res.Success) {
+                        layer.msg("<span style='color:#777777;'>评论成功</span>", { icon: 1 });
+                        $("input[name='email']").val('');
+                        $("textarea[name='message']").val('');
+                        $("input[name='name']").val('');
+                    } else {
+                        layer.msg("<span style='color:#777777;'>评论失败</span>", { icon: 2 });
+                    }
+                },
+                beforeSend: function(xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                error: function (e) {
+                    layer.msg(e.responseText);
+                }
+            });
+            return false;
+        })
     </script>
 	</body>
 </html>

@@ -1,12 +1,12 @@
 # coding=utf-8
-import os, time, json
+import os, time, json, random
 from django.shortcuts import render
 from django.conf import settings
 from django.http import HttpResponse
 from django.http import JsonResponse
 from . import database
 from .models import PageView, Announcement, Article, ArticleRely, TimeLine
-from .models import Websiteinfo, Protagonist, Links, ArticleCategory
+from .models import Websiteinfo, Protagonist, Links, ArticleCategory, AccessBy
 from .utils import articlecode, arttagstolist
 from django.db.models import Q
 
@@ -108,7 +108,6 @@ def detail(request, aid):
     art_cate = ArticleCategory.objects.all()
     print "文章ID:", aid
     art = Article.objects.get(id=aid)
-    print "文章：", art.content
     art_rely = ArticleRely.objects.filter(artid=aid)
     print '文章回复:', art_rely
     # 类似文章
@@ -127,6 +126,16 @@ def detail(request, aid):
         art_like = Article.objects.filter(title__contains=art.title).values('id','title')
     #随机文章
     art_random = Article.objects.order_by('?').values('id','title')[:6]
+    isread =  request.session.get('art'+str(art.id),None)
+    print '文章浏览量:', art.pageviews
+    if isread == None or int(time.time())-request.session.get('art'+str(art.id)+'dir',int(time.time())) > 3600:
+        print '没有COOKIE或阅读时间过期'
+        art.pageviews = art.pageviews+1
+        art.save()
+        request.session['art' + str(art.id)] = True
+        request.session['art' + str(art.id) + 'dir'] = int(time.time())
+    else:
+        print '有COOKIE',isread
     return render(request, 'detail.html',{
         'count': PageView.objects.count(),
         'art': art,
@@ -164,6 +173,43 @@ def homenext(request):
     else:
         return JsonResponse({'Success':False})
 
+def articlerely(request):
+    if request.method == 'POST':
+        req_data = json.loads(request.body.decode())
+        try:
+            artid = req_data['artid']
+            content = req_data['content']
+        except KeyError:  # 获取数据 不完整时 ，返回错误
+            return JsonResponse({'Success': False})
+        if artid != None and content != None:
+            response_data = {}
+            response_data['Success'] = True
+            response_data['avatar'] = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
+            response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            art = Article()
+            art.id = int(artid)
+            ArticleRely.objects.create(content=content, artid=art, name='未知', email='asdf@aa.com', photo=response_data['avatar'])
+            return JsonResponse(response_data)
+
+    return JsonResponse({'Success': False})
+
+def message(request):
+    if request.method == 'POST':
+        req_data = json.loads(request.body.decode())
+        try:
+            name = req_data['name']
+            content = req_data['content']
+            email = req_data['email']
+        except KeyError:  # 获取数据 不完整时 ，返回错误
+            print '网站首页留言，提交数据不完整', req_data
+            return JsonResponse({'Success': False})
+        if name != None and content != None and email != None:
+            response_data = {}
+            response_data['Success'] = True
+            ArticleRely.objects.create(content=content,name= name, email=email)
+            print '有人留言,成功'
+            return JsonResponse(response_data)
+    return JsonResponse({'Success': False})
 
 def mkdir(path):
     path = path.strip()

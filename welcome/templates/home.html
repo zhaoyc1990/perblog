@@ -74,7 +74,9 @@
                     <i style="float:left;line-height:17px;" class="fa fa-volume-up"></i>
                     <div class="home-tips-container">
                         {% for a in announcement  %}
-                            <span style="color: #009688">{{ a.content }}</span>
+                            <span style="color: #009688">{% autoescape off %}
+                                            {{ a.content }}
+                                        {% endautoescape %}</span>
 
                         {% empty %} <!-- 为空时，公告以下内容-->
                             <span style="color: #009688">欢迎道友光临本网站,指导,调研</span>

@@ -82,11 +82,12 @@ class AccessBy(models.Model):
 
 #文章评论及评论回复
 class ArticleRely(models.Model):
-	artid = models.ForeignKey(Article,related_name='artrely',verbose_name='评论文章')
+	artid = models.ForeignKey(Article,related_name='artrely',verbose_name='评论文章', blank=True, null=True)
 	commentid = models.ForeignKey('self',related_name='arirely', verbose_name='回复id',blank=True, null=True)
 	commentip = models.ForeignKey(AccessBy, related_name='artrely', verbose_name='回复ip', blank=True, null=True)
+	photo = models.CharField('随机头像',max_length=100, blank=True, null=True)
 	name = models.CharField('评论者名称', max_length=50)  # 评论者名称
-	email = models.CharField('评论者邮箱', max_length=80, default=None)
+	email = models.CharField('评论者邮箱', max_length=80, blank=True, null=True)
 	content = models.TextField('评论内容', max_length=500)
 	timemodify = models.DateTimeField(auto_now=True)  # 修改时间
 	timestamp = models.DateTimeField(auto_now_add=True)  # 创建时间

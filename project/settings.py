@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 Django settings for this project.
 
@@ -58,6 +59,11 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 )
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+#30天
+SESSION_COOKIE_AGE = 2592000
 
 ROOT_URLCONF = 'project.urls'
 

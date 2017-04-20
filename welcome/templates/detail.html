@@ -27,6 +27,8 @@
     <link href="/static/css/detail.css" rel="stylesheet" />
 </head>
 <body>
+    {% csrf_token %}
+    <span id="artid" style="display:none">{{ art.id }}</span>
     <!-- 导航 -->
     <nav class="blog-nav layui-header">
         <div class="blog-container">
@@ -116,7 +118,9 @@
                                         <span class="time">{{ art_ry.timemodify }}</span>
                                     </div>
                                     <div class="content">
-                                        {{ art_ry.content }}
+                                        {% autoescape off %}
+                                            {{ art_ry.content }}
+                                        {% endautoescape %}
                                     </div>
                                 </div>
                                 {% endfor %}
