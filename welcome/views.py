@@ -52,6 +52,7 @@ def home(request):
     tmp_topart = []
     topart = Article.objects.filter(isstick=1)
     for art in topart:
+        art.relycount = art.artrely.count()
         if art.stickposition > len(tmp_topart):
             tmp_topart.append(art)
         else:
@@ -59,8 +60,7 @@ def home(request):
     #普通文章按时间顺序
     articles = Article.objects.filter(isstick=0)
     for art in articles:
-        print ArticleRely.objects.filter(artid_id=art.id).count()
-        # print art.artrely.count()
+        print art.artrely.count()
         art.relycount = art.artrely.count()
     return render(request, 'home.html',{
         'announcement': announcement,
@@ -108,6 +108,7 @@ def detail(request, aid):
     #文章分类导航
     art_cate = ArticleCategory.objects.all()
     print "文章ID:", aid
+    #文章回复量
     art = Article.objects.get(id=aid)
     art_rely = ArticleRely.objects.filter(artid=aid)
     print '文章回复:', art_rely

@@ -10,7 +10,8 @@ urlpatterns = [
     # url(r'^$', 'project.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
-    url(r'^$', index),
+    url(r'^$', home),
+    url(r'index', index),
     url(r'^health$', health),
     url(r'^temp$', temp),
 	url(r'^home', home),
