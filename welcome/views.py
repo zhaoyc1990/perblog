@@ -150,6 +150,16 @@ def detail(request, aid):
         'art_random': art_random,
     })
 
+def about(request):
+    # 网站信息
+    websiteinfo = None
+    websiteinfo_num = Websiteinfo.objects.count()
+    if websiteinfo_num > 0:
+        websiteinfo = Websiteinfo.objects.get()
+    return render(request, 'about.html',{
+        'websiteinfo': websiteinfo,
+    })
+
 #动态获取下一页
 def homenext(request):
     if request.method == 'POST':
