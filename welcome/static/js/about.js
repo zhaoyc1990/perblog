@@ -5,7 +5,8 @@
 @Site：http://www.lyblogs.cn
 
 */
-
+var csrfitems = document.getElementsByName("csrfmiddlewaretoken");
+var csrftoken = csrfitems[0].value;
 layui.use(['element', 'jquery', 'form', 'layedit'], function () {
     var element = layui.element();
     var form = layui.form();
@@ -40,34 +41,74 @@ layui.use(['element', 'jquery', 'form', 'layedit'], function () {
     //监听留言提交
     form.on('submit(formLeaveMessage)', function (data) {
         var index = layer.load(1);
-        //模拟留言提交
-        setTimeout(function () {
-            layer.close(index);
-            var content = data.field.editorContent;
-            var html = '<li><div class="comment-parent"><img src="../images/Logo_40.png"alt="模拟留言"/><div class="info"><span class="username">模拟留言</span></div><div class="content">' + content + '</div><p class="info info-footer"><span class="time">2017-03-18 18:09</span><a class="btn-reply"href="javascript:;" onclick="btnReplyClick(this)">回复</a></p></div><!--回复表单默认隐藏--><div class="replycontainer layui-hide"><form class="layui-form"action=""><div class="layui-form-item"><textarea name="replyContent"lay-verify="replyContent"placeholder="请输入回复内容"class="layui-textarea"style="min-height:80px;"></textarea></div><div class="layui-form-item"><button class="layui-btn layui-btn-mini"lay-submit="formReply"lay-filter="formReply">提交</button></div></form></div></li>';
-            $('.blog-comment').append(html);
-            $('#remarkEditor').val('');
-            editIndex = layui.layedit.build('remarkEditor', {
-                height: 150,
-                tool: ['face', '|', 'left', 'center', 'right', '|', 'link'],
-            });
-            layer.msg("留言成功", { icon: 1 });
-        }, 500);
+        var message = data.field.editorContent;
+        var name = data.field.name;
+        var email = data.field.email;
+        var website = data.field.website;
+        $.ajax({
+            type: 'post',
+            url: '/api/message',
+            contentType: 'application/json',
+            data: JSON.stringify({ "content": message, "name": name, "email": email, "website": website}),
+            datatype: 'json',
+            success: function (res) {
+                layer.close(index);
+                if (res.Success) {
+                    var html = '<li><div class="comment-parent"><i style="display:none">' + res.id + '</i><img src="' + res.avatar + '"alt="模拟留言"/><div class="info"><span class="username"><a href="' + res.website + '">' + res.name + '</a></span></div><div class="content">' + message + '</div><p class="info info-footer"><span class="time">'+ res.time + '</span><a class="btn-reply"href="javascript:;" onclick="btnReplyClick(this)">回复</a></p></div><!--回复表单默认隐藏--><div class="replycontainer layui-hide"><form class="layui-form"action=""><div class="layui-form-item"><textarea name="replyContent"lay-verify="replyContent"placeholder="请输入回复内容"class="layui-textarea"style="min-height:80px;"></textarea></div><div class="layui-form-item"><button class="layui-btn layui-btn-mini"lay-submit="formReply"lay-filter="formReply">提交</button></div></form></div></li>';
+                    $('.blog-comment').append(html);
+                    $('#remarkEditor').val('');
+                    editIndex = layui.layedit.build('remarkEditor', {
+                        height: 150,
+                        tool: ['face', '|', 'left', 'center', 'right', '|', 'link'],
+                    });
+                    layer.msg("留言成功", { icon: 1 });
+                } else {
+                    layer.msg("<span style='color:#777777;'>评论失败</span>", { icon: 2 });
+                }
+            },
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            error: function (e) {
+                layer.msg(e.responseText);
+            }
+        });
         return false;
     });
 
     //监听留言回复提交
     form.on('submit(formReply)', function (data) {
         var index = layer.load(1);
-        //模拟留言回复
-        setTimeout(function () {
-            layer.close(index);
-            var content = data.field.replyContent;
-            var html = '<div class="comment-child"><img src="../images/Absolutely.jpg"alt="Absolutely"/><div class="info"><span class="username">模拟回复</span><span>' + content + '</span></div><p class="info"><span class="time">2017-03-18 18:26</span></p></div>';
-            $(data.form).find('textarea').val('');
-            $(data.form).parent('.replycontainer').before(html).siblings('.comment-parent').children('p').children('a').click();
-            layer.msg("回复成功", { icon: 1 });
-        }, 500);
+        var message_reply_id = data.field.replyid;
+        var message = data.field.replyContent;
+        var name = data.field.username;
+        var website = data.field.website;
+        var email = data.field.email;
+        $.ajax({
+            type: 'post',
+            url: '/api/message',
+            contentType: 'application/json',
+            data: JSON.stringify({ "id": message_reply_id, "content": message, "name": name, "email": email, "website": website}),
+            datatype: 'json',
+            success: function (res) {
+                layer.close(index);
+                if (res.Success) {
+                    var html = '<div class="comment-child"><img src="' + res.avatar +'"alt="Absolutely"/><div class="info"><span class="username">' + res.name + '</span><span>' + message + '</span></div><p class="info"><span class="time">'+ res.time + '</span></p></div>';
+                    $(data.form).find('textarea').val('');
+                    $(data.form).find('.user-info').val('');
+                    $(data.form).parent('.replycontainer').before(html).siblings('.comment-parent').children('p').children('a').click();
+                    layer.msg("回复成功", { icon: 1 });
+                } else {
+                    layer.msg("<span style='color:#777777;'>评论失败</span>", { icon: 2 });
+                }
+            },
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            error: function (e) {
+                layer.msg(e.responseText);
+            }
+        });
         return false;
     });
 });

@@ -5,7 +5,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.http import JsonResponse
 from . import database
-from .models import PageView, Announcement, Article, ArticleRely, TimeLine
+from .models import PageView, Announcement, Article, ArticleRely, TimeLine, GuestBook
 from .models import Websiteinfo, Protagonist, Links, ArticleCategory, AccessBy
 from .utils import articlecode, arttagstolist
 from django.db.models import Q
@@ -27,7 +27,8 @@ def temp(request):
     return render(request, 'temp.html',{
         'count': PageView.objects.count()
     })
-	
+
+#首页
 def home(request):
     #网站信息
     websiteinfo = None
@@ -44,7 +45,7 @@ def home(request):
     #友情链接
     links = Links.objects.all()
     #时间线
-    timeline = TimeLine.objects.all()[0:4]
+    timeline = TimeLine.objects.all().order_by('-timestamp')[0:4]
     #最热排行--浏览量
     hot_art = Article.objects.all().values('id','title').order_by('-pageviews')[0:7]
     print '热门排行', len(hot_art)
@@ -73,6 +74,7 @@ def home(request):
         'timeline': timeline,
 	})
 
+#时光线 时间线
 def timeline(request):
     # 网站信息
     websiteinfo = None
@@ -83,7 +85,7 @@ def timeline(request):
     nowyear = int(time.strftime('%Y', time.localtime(time.time())))
     timelines = []
     while (year <= nowyear):
-        timelines.append(list(TimeLine.objects.filter(year=year)))
+        timelines.append(list(TimeLine.objects.filter(year=year).order_by('-timestamp')))
         nowyear = nowyear - 1
     return render(request, 'timeline.html', {
         'timelines':timelines,
@@ -154,11 +156,18 @@ def about(request):
     # 网站信息
     websiteinfo = None
     websiteinfo_num = Websiteinfo.objects.count()
+    guestbook = GuestBook.objects.all()[0:7]
     if websiteinfo_num > 0:
         websiteinfo = Websiteinfo.objects.get()
     return render(request, 'about.html',{
         'websiteinfo': websiteinfo,
+        'guestbook': guestbook
     })
+
+
+def messagenext(request):
+    guestbook = GuestBook.objects.all()[7:14]
+    return JsonResponse({'Success':True, guestbook:guestbook})
 
 #动态获取下一页
 def homenext(request):
@@ -208,17 +217,35 @@ def message(request):
     if request.method == 'POST':
         req_data = json.loads(request.body.decode())
         try:
+            message_reply_id = req_data.get('id',None)
             name = req_data['name']
             content = req_data['content']
             email = req_data['email']
+            website = req_data.get('website', None)
         except KeyError:  # 获取数据 不完整时 ，返回错误
             print '网站首页留言，提交数据不完整', req_data
             return JsonResponse({'Success': False})
-        if name != None and content != None and email != None:
+        if name != None and content != None and email != None and message_reply_id == None:
             response_data = {}
             response_data['Success'] = True
-            ArticleRely.objects.create(content=content,name= name, email=email)
+            response_data['name'] = name
+            response_data['website'] = website
+            avatar = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
+            response_data['avatar'] = avatar
+            response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            GuestBook.objects.create(message=content,name= name, email=email, website=website, avatar=avatar)
             print '有人留言,成功'
+            return JsonResponse(response_data)
+        elif name != None and content != None and email != None and message_reply_id != None:
+            response_data = {}
+            response_data['Success'] = True
+            response_data['name'] = name
+            response_data['website'] = website
+            avatar = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
+            response_data['avatar'] = avatar
+            response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            GuestBook.objects.create(message=content, name=name, email=email, messagerely_id= message_reply_id, website=website, avatar=avatar)
+            print '有人留言,成功,回复ID:', message_reply_id
             return JsonResponse(response_data)
     return JsonResponse({'Success': False})
 

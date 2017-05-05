@@ -101,7 +101,7 @@
                             </div>
                             <div class="clear"></div>
                             <div class="article-footer">
-                                <span><i class="fa fa-clock-o"></i>&nbsp;&nbsp;{{ article.timemodify }}</span>
+                                <span><i class="fa fa-clock-o"></i>&nbsp;&nbsp;{{ article.timestamp }}</span>
                                 <span class="article-author"><i class="fa fa-user"></i>&nbsp;&nbsp;赵彦昌</span>
                                 <span><i class="fa fa-tag"></i>&nbsp;&nbsp;<a href="#">{{ article.category.name }}</a></span>
                                 <span class="article-viewinfo"><i class="fa fa-eye"></i>&nbsp;{{ article.pageviews }}</span>
@@ -157,7 +157,7 @@
                         <div class="blog-module-title">热文排行</div>
                         <ul class="fa-ul blog-module-ul">
                             {% for article in hot_art %}
-                                <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail-{{ article.id }}.html">{{ article.title }}</a></li>
+                                <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail/{{ article.id }}.html">{{ article.title }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>

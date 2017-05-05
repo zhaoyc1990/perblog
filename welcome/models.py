@@ -5,20 +5,31 @@ import time, os, datetime, uuid
 # Create your models here.
 
 class PageView(models.Model):
-    hostname = models.CharField(max_length=32)
-    timestamp = models.DateTimeField(auto_now_add=True)
-	
+	hostname = models.CharField(max_length=32)
+	timestamp = models.DateTimeField(auto_now_add=True)
+	def __unicode__(self):
+		return self.__str__
+	def __str__(self):
+		return self.hostname
+	class Meta:
+		verbose_name_plural = verbose_name = '没用'
+
 class GuestBook(models.Model):
+	messagerely = models.ForeignKey('self', related_name='relymessage', verbose_name='回复id', blank=True, null=True)
+	avatar = models.CharField('头像', max_length=200, default='/static/images/Logo_40.png')
 	name = models.CharField('留言者名称', max_length=50)              #留言者名称
 	email = models.CharField('留言者邮箱', max_length=80,default=None)
 	message = models.TextField('留言内容', max_length=500)
+	website = models.CharField('网站地址', max_length=200,blank=True, null=True)
 	timemodify = models.DateTimeField(auto_now=True)    #修改时间
-	timestamp = models.DateTimeField(auto_now_add=True)	#创建时间	
+	timestamp = models.DateTimeField(auto_now_add=True)	#创建时间
 
 	def __unicode__(self):
 		return self.__str__
 	def __str__(self):
 		return self.name
+	def replypeople(self):
+		return self.relymessage.all()
 	class Meta:
 		verbose_name_plural = verbose_name = '网站留言'
 
@@ -29,6 +40,8 @@ class Announcement(models.Model):
 
 	def __str__(self):
 		return self.content
+	class Meta:
+		verbose_name_plural = verbose_name = '网站公告'
 
 class ArticleCategory(models.Model):
 	name = models.CharField('类型名称', max_length=50)
@@ -79,6 +92,8 @@ class Article(models.Model):
 class AccessBy(models.Model):
 	ip = models.GenericIPAddressField('访问者ip')
 	count = models.IntegerField('该IP访问次数')
+	class Meta:
+		verbose_name_plural = verbose_name = 'IP记录'
 
 #文章评论及评论回复
 class ArticleRely(models.Model):

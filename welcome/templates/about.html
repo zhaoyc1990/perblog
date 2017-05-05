@@ -25,6 +25,7 @@
     <link href="/static/css/about.css" rel="stylesheet" />
 </head>
 <body>
+{% csrf_token %}
     <!-- 导航 -->
     <nav class="blog-nav layui-header">
         <div class="blog-container">
@@ -96,7 +97,7 @@
                                 <fieldset class="layui-elem-field layui-field-title">
                                     <legend>简介</legend>
                                     <div class="layui-field-box aboutinfo-abstract">
-                                        <p style="text-align:center;">不落阁是一个由ASP.NET MVC开发的个人博客网站，诞生于2016年11月7日，起劲为止经历了一次大改，暂且称为不落阁2.0。</p>
+                                        <p style="text-align:center;">赵彦昌是一个由django开发的个人博客网站，诞生于2016年11月7日，起劲为止经历了一次大改，暂且称为不落阁2.0。</p>
                                         <h1>第一个版本</h1>
                                         <p>诞生的版本，采用ASP.NET MVC + Entity Framework作为后台框架，前端几乎自己手写，用了Bootstrap的栅格系统来布局！起初并没有注意美工，只打算完成基本的功能，故视觉体验是比较差的。</p>
                                         <h1>第二个版本</h1>
@@ -126,7 +127,7 @@
                                 <fieldset class="layui-elem-field layui-field-title">
                                     <legend>简介</legend>
                                     <div class="layui-field-box aboutinfo-abstract abstract-bloger">
-                                        <p style="text-align:center;">Absolutely，不落阁创始人，诞生于1996年2月14日，目前是一个码农，从事.NET开发。</p>
+                                        <p style="text-align:center;">Absolutely，赵彦昌创始人，诞生于1996年2月14日，目前是一个码农，从事.NET开发。</p>
                                         <h1>个人信息</h1>
                                         <p>暂无</p>
                                         <h1>个人介绍</h1>
@@ -142,7 +143,7 @@
                                     <img src="/static/images/handshake.png" alt="友情链接" />
                                 </div>
                                 <p class="aboutinfo-nickname">友情链接</p>
-                                <p class="aboutinfo-introduce">Name：不落阁&nbsp;&nbsp;&nbsp;&nbsp;Site：www.zhaoyanchang.com</p>
+                                <p class="aboutinfo-introduce">Name：赵彦昌&nbsp;&nbsp;&nbsp;&nbsp;Site：www.zhaoyanchang.com</p>
                                 <p class="aboutinfo-location">
                                     <i class="fa fa-close"></i>经常宕机&nbsp;
                                     <i class="fa fa-close"></i>不合法规&nbsp;
@@ -198,6 +199,18 @@
                                         <div class="leavemessage" style="text-align:initial">
                                             <form class="layui-form blog-editor" action="">
                                                 <div class="layui-form-item">
+                                                    <label for="author" class="aboutinfo-location">姓名 <span class="required  ">*</span></label>
+                                                    <input id="author" class="layui-input" name="name" type="text" value=""  size="30" maxlength="245" aria-required="true" required="required">
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <label for="author" class="aboutinfo-location">邮箱 <span class="required  ">*</span></label>
+                                                    <input id="author" class="layui-input" name="email" type="text" value=""  size="30" maxlength="245" aria-required="true" required="required">
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <label for="author" class="aboutinfo-location">网址 <span class="required  "></span></label>
+                                                    <input id="author" class="layui-input" name="website" type="text" value=""  size="30" maxlength="245" aria-required="true" required="required">
+                                                </div>
+                                                <div class="layui-form-item">
                                                     <textarea name="editorContent" lay-verify="content" id="remarkEditor" placeholder="请输入内容" class="layui-textarea layui-hide"></textarea>
                                                 </div>
                                                 <div class="layui-form-item">
@@ -205,35 +218,42 @@
                                                 </div>
                                             </form>
                                             <ul class="blog-comment">
+                                                {% for mes in guestbook %}
                                                 <li>
                                                     <div class="comment-parent">
-                                                        <img src="/static/images/Logo_40.png" alt="赵彦昌 博客" />
+                                                        <img src="{{ mes.avatar }}" alt="{{ mes.name }}" />
                                                         <div class="info">
-                                                            <span class="username">赵彦昌 博客</span>
+                                                            <span class="username">{{ mes.name }}</span>
                                                         </div>
                                                         <div class="content">
-                                                            我为大家做了模拟留言与回复！试试吧！
+                                                            {% autoescape off %}
+                                                                {{ mes.message }}
+                                                            {% endautoescape %}
                                                         </div>
-                                                        <p class="info info-footer"><span class="time">2017-03-18 18:09</span><a class="btn-reply" href="javascript:;" onclick="btnReplyClick(this)">回复</a></p>
+                                                        <p class="info info-footer"><span class="time">{{ mes.timestamp | date:"Y-m-j H:i" }}</span><a class="btn-reply" href="javascript:;" onclick="btnReplyClick(this)">回复</a></p>
                                                     </div>
                                                     <hr />
-                                                    <div class="comment-child">
-                                                        <img src="/static/images/Absolutely.jpg" alt="Absolutely" />
-                                                        <div class="info">
-                                                            <span class="username">Absolutely</span><span>这是用户回复内容</span>
+                                                    {% for mesch in mes.replypeople %}
+                                                        <div class="comment-child">
+                                                            <img src="{{ mesch.avatar }}" alt="{{ mesch.name }}" />
+                                                            <div class="info">
+                                                                <span class="username">{{ mesch.name }}</span><span>{% autoescape off %}
+                                                                {{ mesch.message }}
+                                                            {% endautoescape %}</span>
+                                                            </div>
+                                                            <p class="info"><span class="time">{{ mesch.timestamp | date:"Y-m-j H:i" }}</span></p>
                                                         </div>
-                                                        <p class="info"><span class="time">2017-03-18 18:26</span></p>
-                                                    </div>
-                                                    <div class="comment-child">
-                                                        <img src="/static/images/Absolutely.jpg" alt="Absolutely" />
-                                                        <div class="info">
-                                                            <span class="username">Absolutely</span><span>这是第二个用户回复内容</span>
-                                                        </div>
-                                                        <p class="info"><span class="time">2017-03-18 18:26</span></p>
-                                                    </div>
-                                                    <!-- 回复表单默认隐藏 -->
+
+                                                    {% endfor %}
                                                     <div class="replycontainer layui-hide">
                                                         <form class="layui-form" action="">
+                                                            <input class="layui-hide" name="replyid" value="{{ mes.id }}"/>
+                                                            <div class="layui-input-inline user-info" style="width:49%;"><input type="text" name="username" placeholder="名字" class="layui-input" ></div>
+
+                                                            <div class="layui-input-inline user-info" style="width:50%;"><input type="text" name="email" placeholder="邮箱" class="layui-input"></div>
+                                                            <div class="layui-form-item user-info">
+                                                                <input name="website"  type="text"  lay-verify="replyContent" placeholder="您的网址" class="layui-input" />
+                                                            </div>
                                                             <div class="layui-form-item">
                                                                 <textarea name="replyContent" lay-verify="replyContent" placeholder="请输入回复内容" class="layui-textarea" style="min-height:80px;"></textarea>
                                                             </div>
@@ -243,12 +263,13 @@
                                                         </form>
                                                     </div>
                                                 </li>
+                                                {% endfor %}
                                             </ul>
                                         </div>
                                     </div>
                                 </fieldset>
                             </div>
-                        </div><!--留言墙End-->-->
+                        </div><!--留言墙End-->
                     </div>
                 </div>
             </div>
