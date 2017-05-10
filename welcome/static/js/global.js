@@ -7,6 +7,7 @@
 */
 
 layui.use(['element', 'layer', 'util', 'form'], function () {
+    var element = layui.element();
     var $ = layui.jquery;
     //模拟QQ登陆
     $('.blog-user').click(function () {
@@ -30,6 +31,10 @@ layui.use(['element', 'layer', 'util', 'form'], function () {
                 }
             }
         }
+    });
+     //监听导航点击
+    element.on('nav(nav)', function (elem) {
+
     });
 
     //子栏目导航点击事件

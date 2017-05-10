@@ -1,0 +1,129 @@
+﻿<!--
+    
+ @Name：不落阁整站模板源码
+ @Author：Absolutely
+ @Site：http://www.lyblogs.cn
+
+ -->
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; Charset=gb2312">
+    <meta http-equiv="Content-Language" content="zh-CN">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>资源分享 - - {{ websiteinfo.title }}</title>
+    <link rel="shortcut icon" href="/static/images/Logo_40.png" type="image/x-icon">
+    <!--Layui-->
+    <link href="/static/plug/layui/css/layui.css" rel="stylesheet" />
+    <!--font-awesome-->
+    <link href="/static/plug/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <!--全局样式表-->
+    <link href="/static/css/global.css" rel="stylesheet" />
+    <!-- 本页样式表 -->
+    <link href="/static/css/resource.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- 导航 -->
+    {% include 'welcome/nav.html' %}
+    <!-- 主体（一般只改变这里的内容） -->
+    <div class="blog-body">
+        <div class="blog-container">
+            <blockquote class="layui-elem-quote sitemap layui-breadcrumb shadow">
+                <a href="home.html" title="网站首页">网站首页</a>
+                <a><cite>资源分享</cite></a>
+            </blockquote>
+            <div class="blog-main">
+                <div class="blog-main">
+                    <div class="child-nav shadow">
+                        <span class="child-nav-btn child-nav-btn-this">全部</span>
+                        <!--<span class="child-nav-btn">源码</span>
+                        <span class="child-nav-btn">工具</span>
+                        <span class="child-nav-btn">电子书</span>-->
+                    </div>
+                    <div class="resource-main">
+                        {% for share in shares %}
+                        <div class="resource shadow">
+                            <div class="resource-cover">
+                                    {% if share.show == '' %}
+                                        <a href="/share-{{ share.id }}.html" target="_blank">
+                                    {% else %}
+                                        <a href="{{ share.show }}" target="_blank">
+                                    {% endif %}
+
+                                    {% if share.webimg != '' %}
+                                        <img src="{{ share.webimg }}" alt="{{ share.title }}" />
+                                    {% else %}
+                                        <img src="{{ share.img }}" alt="{{ share.title }}" />
+                                    {% endif %}
+                                </a>
+                            </div>
+                            <h1 class="resource-title"><a href="
+                                {% if share.show == '' %}
+                                        {{ share.id }}.html
+                                    {% else %}
+                                       {{ share.show }}
+                                    {% endif %}
+                            " target="_blank">{{ share.title }}</a></h1>
+                            <p class="resource-abstract">{{ share.abstract }}</p>
+                            <div class="resource-info">
+                                <span class="category"><a><i class="fa fa-tags fa-fw"></i>&nbsp;{{ share.categoryid.name }}</a></span>
+                                <span class="author"><i class="fa fa-user fa-fw"></i>赵彦昌</span>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="resource-footer">
+                                <a class="layui-btn layui-btn-small layui-btn-primary" href="
+                                {% if share.show == '' %}
+                                    {{ share.id }}.html" target="_blank"><i class="fa fa-eye fa-fw"></i>详情</a>
+                                    {% else %}
+                                       {{ share.show }}" target="_blank"><i class="fa fa-eye fa-fw"></i>演示</a>
+                                    {% endif %}
+
+                                <a class="layui-btn layui-btn-small layui-btn-primary" href="
+                                {% if share.download == '' %}
+                                    {{ share.id }}.html" target="_blank"><i class="fa fa-eye fa-fw"></i>打开</a>
+                                    {% else %}
+                                       {{ share.download }}" target="_blank"><i class="fa fa-eye fa-fw"></i>下载</a>
+                                    {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <!-- 清除浮动 -->
+                        <div class="clear"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 底部 -->
+    {% include 'welcome/footer.html' %}
+    <!--侧边导航-->
+    {% include 'welcome/left-nav.html' %}
+    <!--分享窗体-->
+    <div class="blog-share layui-hide">
+        <div class="blog-share-body">
+            <div style="width: 200px;height:100%;">
+                <div class="bdsharebuttonbox">
+                    <a class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+                    <a class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+                    <a class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+                    <a class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--遮罩-->
+    <div class="blog-mask animated layui-hide"></div>
+    <!-- layui.js -->
+    <script src="/static/plug/layui/layui.js"></script>
+    <!-- 全局脚本 -->
+    <script src="/static/js/global.js"></script>
+</body>
+<script>
+    layui.use([ 'layer'], function () {
+        var $ = layui.jquery;
+        $(".layui-nav").children("li:eq(2)").addClass("layui-this");
+    });
+</script>
+</html>

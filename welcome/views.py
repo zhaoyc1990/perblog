@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from . import database
 from .models import PageView, Announcement, Article, ArticleRely, TimeLine, GuestBook
-from .models import Websiteinfo, Protagonist, Links, ArticleCategory, AccessBy
+from .models import Websiteinfo, Protagonist, Links, ArticleCategory, AccessBy, Share
 from .utils import articlecode, arttagstolist
 from django.db.models import Q
 
@@ -164,6 +164,29 @@ def about(request):
         'guestbook': guestbook
     })
 
+#分享页面
+def share(request):
+    # 网站信息
+    websiteinfo = None
+    websiteinfo_num = Websiteinfo.objects.count()
+    if websiteinfo_num > 0:
+        websiteinfo = Websiteinfo.objects.get()
+    # 博主信息
+    protagonist = None
+    protagonist_num = Protagonist.objects.count()
+    if protagonist_num > 0:
+        protagonist = Protagonist.objects.get()
+    if request.method == 'POST':
+        pass
+    elif request.method == 'GET':
+        shares = Share.objects.all()[:7]
+        pass
+    return render(request, 'resource.html', {
+        'websiteinfo': websiteinfo,
+        'shares': shares,
+        'protagonist': protagonist,
+    })
+
 
 def messagenext(request):
     guestbook = GuestBook.objects.all()[7:14]
@@ -248,6 +271,7 @@ def message(request):
             print '有人留言,成功,回复ID:', message_reply_id
             return JsonResponse(response_data)
     return JsonResponse({'Success': False})
+
 
 def mkdir(path):
     path = path.strip()

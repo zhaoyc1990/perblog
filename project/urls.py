@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from welcome.views import index, health, temp, home, uploadImg, timeline, detail, homenext, articlerely, message
-from welcome.views import about
+from welcome.views import about, share
 import settings
 from django.conf.urls.static import static
 
@@ -18,6 +18,7 @@ urlpatterns = [
 	url(r'^home', home),
     url(r'^timeline.html', timeline),
     url(r'^about', about),
+    url(r'^share', share),
     url(r'^detail/(?P<aid>\d+).html/$', detail),
     url(r'^api/article/next', homenext),
     url(r'^api/article/rely', articlerely),

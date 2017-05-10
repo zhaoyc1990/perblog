@@ -2,7 +2,7 @@
 from django.contrib import admin
 
 from .models import PageView, GuestBook, Announcement, Article, ArticleCategory, ArticleRely, AccessBy
-from .models import TimeLine, Protagonist, Websiteinfo, Links
+from .models import TimeLine, Protagonist, Websiteinfo, Links, Share, ShareCategory
 # Register your models here.
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
@@ -29,3 +29,5 @@ admin.site.register(TimeLine)
 admin.site.register(Protagonist)
 admin.site.register(Websiteinfo)
 admin.site.register(Links)
+admin.site.register(Share)
+admin.site.register(ShareCategory)

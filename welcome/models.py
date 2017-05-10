@@ -114,6 +114,43 @@ class ArticleRely(models.Model):
 	class Meta:
 		verbose_name_plural = verbose_name = '文章评论及评论回复'
 
+class ShareCategory(models.Model):
+	name = models.CharField('类型名称', max_length=50)
+	timemodify = models.DateTimeField(auto_now=True)
+	timestamp = models.DateTimeField(auto_now_add=True)  # 创建时间
+	def __unicode__(self):
+		return self.name
+	def __str__(self):
+		return self.name
+	class Meta:
+		verbose_name_plural = verbose_name = '分享类别'
+
+#分享
+class Share(models.Model):
+	categoryid = models.ForeignKey(ShareCategory, related_name='category', verbose_name='分类', blank=True, null=True)
+	title =  models.CharField('标题', max_length=100) #标题
+	tags = models.CharField('文章标签', max_length=120, null=True, blank=True)
+	abstract = models.CharField('摘要', max_length=300, blank=True, null=True)
+	content = models.TextField('文章内容', default=None)
+	img = ImageWithThumbsField('文章可观性图片', upload_to=generate_filename, default='/static/article/Thumbnails/no-img.jpg',
+							   sizes=((256, 148),))
+	webimg = models.CharField('网络图片用于文章可观性图片', max_length=200,null=True, blank=True, default='')
+	pageviews = models.IntegerField('文章浏览量', default=0)
+	show = models.CharField('演示地址', max_length=200, default='')
+	download = models.CharField('下载地址', max_length=200, default='')
+	likes = models.PositiveIntegerField('点赞数', default=0)
+	relycount = models.PositiveIntegerField('回复量', default=0)  # 临时字段不需要数据库操作
+	isstick = models.IntegerField('是否顶置', default=0)  # 0为普通, 1为置顶
+	stickposition = models.IntegerField('置顶位置', default=0)  # 以十的余数,最多十个置顶
+	timemodify = models.DateTimeField(auto_now=True)  # 修改时间
+	timestamp = models.DateTimeField(auto_now_add=True)  # 创建时间
+	def __unicode__(self):
+		return self.title
+	def __str__(self):
+		return self.title
+	class Meta:
+		verbose_name_plural = verbose_name = '分享'
+
 #时光线
 class TimeLine(models.Model):
 	year = models.PositiveIntegerField('年',null=True, blank=True)
