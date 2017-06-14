@@ -25,7 +25,7 @@ class GuestBook(models.Model):
 	timestamp = models.DateTimeField(auto_now_add=True)	#创建时间
 
 	def __unicode__(self):
-		return self.__str__
+		return self.name
 	def __str__(self):
 		return self.name
 	def replypeople(self):

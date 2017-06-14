@@ -12,7 +12,11 @@ def articlecode(article):
             ts = str(t[0]) + '年' + str(t[1]) + '月' + str(t[2]) + '日'
         else:
             ts = str(t[0]) + '年' + str(t[1]) + '月' + str(t[2]) + '日 ' + str(t[3]+8) + ':' + str(t[4])
-        artjson_data =artjson_data + '<div class="article shadow" ><div class="article-left" ><img src=" ' + settings.MEDIA_URL + art.img.url_138x53 + '" alt="' + art.title + '" / ></div><div class="article-right" ><div class ="article-title" ><a href="/detail/' +  str(art.id)  + '.html">'+art.title+'</a></div><div class="article-abstract" >' + art.abstract + '</div></div> <div class="clear" > </div><div class="article-footer" ><span> <iclass ="fa fa-clock-o" > </i> &nbsp; &nbsp;'+ ts + '</span><span class="article-author"  <i class="fa fa-user" > </i> &nbsp; &nbsp;赵彦昌 </span ><span> <i class ="fa fa-tag" > </i> &nbsp; &nbsp; <a href="#" >' + art.category.name + '</a> </span><span class="article-viewinfo" > <i class ="fa fa-eye" > </i> &nbsp;'+str(art.pageviews) +'</span><span class="article-viewinfo" > <i class="fa fa-commenting" > </i> &nbsp;'+str(art.relycount)+'</span></div></div>'
+        if art.img == '':
+            img = art.webimg
+        else:
+            img= art.img.url_138x53
+        artjson_data =artjson_data + '<div class="article shadow" ><div class="article-left" ><img src=" '  + img + '" alt="' + art.title + '" / ></div><div class="article-right" ><div class ="article-title" ><a href="/detail/' +  str(art.id)  + '.html">'+art.title+'</a></div><div class="article-abstract" >' + art.abstract + '</div></div> <div class="clear" > </div><div class="article-footer" ><span> <iclass ="fa fa-clock-o" > </i> &nbsp; &nbsp;'+ ts + '</span><span class="article-author"  <i class="fa fa-user" > </i> &nbsp; &nbsp;赵彦昌 </span ><span> <i class ="fa fa-tag" > </i> &nbsp; &nbsp; <a href="#" >' + art.category.name + '</a> </span><span class="article-viewinfo" > <i class ="fa fa-eye" > </i> &nbsp;'+str(art.pageviews) +'</span><span class="article-viewinfo" > <i class="fa fa-commenting" > </i> &nbsp;'+str(art.relycount)+'</span></div></div>'
     return artjson_data
 
 def arttagstolist(tags):
