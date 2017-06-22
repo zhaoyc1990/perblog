@@ -12,7 +12,7 @@ def articlecode(article):
             ts = str(t[0]) + '年' + str(t[1]) + '月' + str(t[2]) + '日'
         else:
             ts = str(t[0]) + '年' + str(t[1]) + '月' + str(t[2]) + '日 ' + str(t[3]+8) + ':' + str(t[4])
-        if art.img == '':
+        if art.webimg != '':
             img = art.webimg
         else:
             img= art.img.url_138x53

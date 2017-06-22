@@ -59,7 +59,7 @@ def home(request):
         else:
             tmp_topart.insert(art.stickposition, art)
     #普通文章按时间顺序
-    articles = Article.objects.filter(isstick=0)
+    articles = Article.objects.filter(isstick=0).order_by('-timestamp')[0:7]
     for art in articles:
         print art.artrely.count()
         art.relycount = art.artrely.count()
@@ -203,11 +203,13 @@ def homenext(request):
         except KeyError: #获取数据 不完整时 ，返回错误
             return JsonResponse({'Success':False})
         if type == 1: # 1 代表首页, 2 代表文章专栏
-            start = (currentIndex-1)*7 +1
-            end = currentIndex*7 +1
+            start = (currentIndex-1)*pagesize
+            end = currentIndex*pagesize
         print "currentIndex", currentIndex
-        art = Article.objects.filter(isstick=0)[start:end]
-        art_count = Article.objects.count()
+        art = Article.objects.filter(isstick=0).order_by('-timestamp')[start:end]
+        art_count = Article.objects.filter(isstick=0).count()
+        if art_count%pagesize != 0:
+            art_count = art_count/pagesize+ 1
         response_data = {}
         response_data['Data'] = articlecode(art)
         response_data['Success'] = True

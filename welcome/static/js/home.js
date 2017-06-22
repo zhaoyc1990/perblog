@@ -29,7 +29,7 @@ layui.use(['jquery', 'flow'], function () {
                 type: 'post',
                 url: '/api/article/next',
                 contentType: 'application/json',
-                data: JSON.stringify({ "currentIndex": page, "pageSize": 1, "type": 1 }),
+                data: JSON.stringify({ "currentIndex": page, "pageSize": 7, "type": 1 }),
                 datatype: 'json',
                 success: function (res) {
                     if (res.Success) {

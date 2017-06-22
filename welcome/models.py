@@ -67,6 +67,7 @@ def generate_filename(instance, filename):
 	filename = uuid.uuid4().hex + os.path.splitext(filename)[-1]
 	return os.path.join(directory_name, filename)
 
+#文章
 class Article(models.Model):
 	category = models.ForeignKey(ArticleCategory,related_name='articale',verbose_name='文章类别')
 	title = models.CharField('文章名称', max_length=100)
@@ -201,6 +202,7 @@ class Protagonist(models.Model):
 #网站信息
 class Websiteinfo(models.Model):
 	title = models.CharField('网站名称', max_length=200)
+	websiteip = models.CharField('网站首页域名(www.zhaoyanchang.com)', max_length=200, default='#')
 	info = models.CharField('网站简介', max_length=200, blank=True, null=True)
 	photo = ImageWithThumbsField('网站图标', upload_to=generate_filename, sizes=((40,40),) )
 	casenum = models.CharField('备案号', max_length=50, help_text='没有，不写', blank=True, null=True)
