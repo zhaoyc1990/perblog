@@ -2,10 +2,12 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from welcome.views import index, health, temp, home, uploadImg, timeline, detail, homenext, articlerely, message
-from welcome.views import about, share
+from welcome.views import about, share, page_not_found
+from django.conf.urls import handler404, handler500
+
 import settings
 from django.conf.urls.static import static
-
+handler404 = page_not_found
 urlpatterns = [
     # Examples:
     # url(r'^$', 'project.views.home', name='home'),

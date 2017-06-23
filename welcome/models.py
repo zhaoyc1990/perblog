@@ -214,6 +214,7 @@ class Websiteinfo(models.Model):
 	class Meta:
 		verbose_name_plural = verbose_name = '网站信息'
 
+#友情链接
 class Links(models.Model):
 	title = models.CharField('名字', max_length=50)
 	link = models.CharField('超连接', max_length=100)
@@ -223,3 +224,21 @@ class Links(models.Model):
 		return self.title
 	class Meta:
 		verbose_name_plural = verbose_name = '友情链接'
+
+#广告代码
+class Ad(models.Model):
+	POSITION_CHOICES = (
+		('top', u'顶部'),
+		('footer', u'底部'),
+		('left', u'左边'),
+		('right', u'右边'),
+	)
+	position = models.CharField('位置', max_length=100, choices=POSITION_CHOICES)
+	advertisers = models.CharField('广告商', max_length=200, blank=True, null=True)
+	content = models.TextField('代码：')
+	def __unicode__(self):
+		return self.position
+	def __str__(self):
+		return self.position
+	class Meta:
+		verbose_name_plural = verbose_name = '广告代码'

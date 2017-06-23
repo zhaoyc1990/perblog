@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from . import database
 from .models import PageView, Announcement, Article, ArticleRely, TimeLine, GuestBook
-from .models import Websiteinfo, Protagonist, Links, ArticleCategory, AccessBy, Share
+from .models import Websiteinfo, Protagonist, Links, ArticleCategory, AccessBy, Share, Ad
 from .utils import articlecode, arttagstolist
 from django.db.models import Q
 
@@ -63,6 +63,9 @@ def home(request):
     for art in articles:
         print art.artrely.count()
         art.relycount = art.artrely.count()
+
+    #广告
+    ads = Ad.objects.all()
     return render(request, 'home.html',{
         'announcement': announcement,
         'articles': articles,
@@ -72,6 +75,7 @@ def home(request):
         'protagonist': protagonist,
         'links': links,
         'timeline': timeline,
+        'ads': ads,
 	})
 
 #时光线 时间线
@@ -141,6 +145,8 @@ def detail(request, aid):
     else:
         print '有COOKIE',isread
         request.session['art' + str(art.id) + 'dir'] = int(time.time())
+    # 广告
+    ads = Ad.objects.all()
     return render(request, 'detail.html',{
         'count': PageView.objects.count(),
         'art': art,
@@ -150,6 +156,7 @@ def detail(request, aid):
         'art_cate': art_cate,
         'art_like': art_like[0:4],
         'art_random': art_random,
+        'ads': ads,
     })
 
 def about(request):
@@ -259,7 +266,7 @@ def message(request):
             response_data['avatar'] = avatar
             response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             GuestBook.objects.create(message=content,name= name, email=email, website=website, avatar=avatar)
-            print '有人留言,成功'
+            print  name + '留言,成功'
             return JsonResponse(response_data)
         elif name != None and content != None and email != None and message_reply_id != None:
             response_data = {}
@@ -270,7 +277,7 @@ def message(request):
             response_data['avatar'] = avatar
             response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             GuestBook.objects.create(message=content, name=name, email=email, messagerely_id= message_reply_id, website=website, avatar=avatar)
-            print '有人留言,成功,回复ID:', message_reply_id
+            print name + '留言,成功,回复ID:', message_reply_id
             return JsonResponse(response_data)
     return JsonResponse({'Success': False})
 
@@ -305,3 +312,6 @@ def uploadImg(request):
         dict_tmp['error'] = 0
         dict_tmp['url'] = '/static/article/images/' + file_name
         return HttpResponse(json.dumps(dict_tmp))
+
+def page_not_found(request):
+    return render(request, '404.html')

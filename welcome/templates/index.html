@@ -153,10 +153,10 @@
 									</div>
 									<div class="span-1-5">
 										<ul class="contact-icons color1">
-											<li class="icon fa-twitter"><a href="https://twitter.com/YanChang_Zhao">@YanChang_Zhao</a></li>
+											<li class="icon fa-twitter"><a href="https://twitter.com/YanChang_Zhao" target="_blank">@YanChang_Zhao</a></li>
 											<li class="icon fa-qq"><a href="#">385390146</a></li>
-											<li class="icon fa-snapchat-ghost"><a href="#" style="font-size:14px;">谁能告诉我，这是个什么法器</a></li>
-											<li class="icon fa-github"><a href="https://github.com/zhaoyc1990" style="font-size:14px;">都是垃圾，不要看了</a></li>
+											<li class="icon fa-snapchat-ghost"><a href="#" style="font-size:14px;" >谁能告诉我，这是个什么法器</a></li>
+											<li class="icon fa-github"><a href="https://github.com/zhaoyc1990" style="font-size:14px;" target="_blank">都是垃圾，不要看了</a></li>
 											<li class="icon fa-medium"><a href="#" style="font-size:18px;">zhaoyanchang456@gmail.com</a></li>
 										</ul>
 									</div>
@@ -181,10 +181,14 @@
     <script>
         var csrfitems = document.getElementsByName("csrfmiddlewaretoken");
         var csrftoken = csrfitems[0].value;
-        $(".button").click(function(){
+        $("input.button").click(function(){
             var email = $("input[name='email']").val();
             var message = $("textarea[name='message']").val();
             var name = $("input[name='name']").val();
+            if ( message == "" || name == "" ){
+                layer.msg("<span style='color:#777777;'>有意思吗?</span>", { icon: 2 });
+                return false;
+            }
             $.ajax({
                 type: 'post',
                 url: '/api/message',

@@ -2,7 +2,7 @@
 from django.contrib import admin
 
 from .models import PageView, GuestBook, Announcement, Article, ArticleCategory, ArticleRely, AccessBy
-from .models import TimeLine, Protagonist, Websiteinfo, Links, Share, ShareCategory
+from .models import TimeLine, Protagonist, Websiteinfo, Links, Share, ShareCategory, Ad
 # Register your models here.
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
@@ -18,6 +18,9 @@ class ArticleAdmin(admin.ModelAdmin):
 class PageViewAdmin(admin.ModelAdmin):
     list_display = ['hostname', 'timestamp']
 
+class AdAdmin(admin.ModelAdmin):
+    list_display = ['advertisers', 'position']
+
 admin.site.register(PageView, PageViewAdmin)
 admin.site.register(GuestBook)
 admin.site.register(Announcement)
@@ -31,3 +34,4 @@ admin.site.register(Websiteinfo)
 admin.site.register(Links)
 admin.site.register(Share)
 admin.site.register(ShareCategory)
+admin.site.register(Ad, AdAdmin)
