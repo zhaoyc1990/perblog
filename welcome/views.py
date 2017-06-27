@@ -9,6 +9,7 @@ from .models import PageView, Announcement, Article, ArticleRely, TimeLine, Gues
 from .models import Websiteinfo, Protagonist, Links, ArticleCategory, AccessBy, Share, Ad
 from .utils import articlecode, arttagstolist
 from django.db.models import Q
+import datetime
 
 def index(request):
     hostname = os.getenv('HOSTNAME', 'unknown')
@@ -77,6 +78,103 @@ def home(request):
         'timeline': timeline,
         'ads': ads,
 	})
+
+#文章列表
+def article(request):
+    # 网站信息
+    websiteinfo = None
+    websiteinfo_num = Websiteinfo.objects.count()
+    if websiteinfo_num > 0:
+        websiteinfo = Websiteinfo.objects.get()
+    # 网站公告
+    announcement = Announcement.objects.all()
+    # 博主信息
+    protagonist = None
+    protagonist_num = Protagonist.objects.count()
+    if protagonist_num > 0:
+        protagonist = Protagonist.objects.get()
+    # 文章分类导航
+    art_cate = ArticleCategory.objects.all()
+    # 广告
+    ads = Ad.objects.all()
+    # 顶置的文章
+    tmp_topart = []
+    topart = Article.objects.filter(isstick=1)
+    for art in topart:
+        art.relycount = art.artrely.count()
+        if art.stickposition > len(tmp_topart):
+            tmp_topart.append(art)
+        else:
+            tmp_topart.insert(art.stickposition, art)
+    # 普通文章按时间顺序
+    articles = Article.objects.filter(isstick=0).order_by('-timestamp')[0:7]
+    for art in articles:
+        print art.artrely.count()
+        art.relycount = art.artrely.count()
+    #最新文章评论
+    art_rely = ArticleRely.objects.all()[0:6]
+
+    #搜索
+    search = None
+    art_like = None
+    if request.GET.get('keywords'):
+        isok = True
+        if request.session.get('searchtime', None) == None:
+            request.session['searchtime'] = int(time.time())
+            print  request.session.get('searchtime', None) , 'asdfa'
+        elif int(time.time())-request.session.get('searchtime', int(time.time())) < 5:
+            print  request.session.get('searchtime', None) , 'asdf'
+            isok = False
+        else:
+            print  request.session.get('searchtime', None) , 'asdfdd'
+            request.session['searchtime'] = int(time.time())
+        print time.time()
+        if isok:
+            keywords = request.GET.get('keywords')
+            print 'keywords:',keywords
+            # 类似文章
+            taglist = arttagstolist(keywords)
+            if len(taglist) == 1:
+                art_like = Article.objects.filter(title__contains=taglist[0])
+            elif len(taglist) == 2:
+                art_like = Article.objects.filter(Q(title__contains=taglist[0]) | Q(title__contains=taglist[1]))
+            elif len(taglist) == 3:
+                art_like = Article.objects.filter(
+                    Q(title__contains=taglist[0]) | Q(title__contains=taglist[1]) | Q(title__contains=taglist[2]))
+            elif len(taglist) == 4:
+                art_like = Article.objects.filter(
+                    Q(title__contains=taglist[0]) | Q(title__contains=taglist[1]) | Q(title__contains=taglist[2]) | Q(
+                        title__contains=taglist[3]))
+            elif len(taglist) == 5:  # 最多支持五个标签模糊查找 类似文章
+                art_like = Article.objects.filter(
+                    Q(title__contains=taglist[0]) | Q(title__contains=taglist[1]) | Q(title__contains=taglist[2]) | Q(
+                        title__contains=taglist[3]) | Q(title__contains=taglist[4]))
+            else:
+                art_like = Article.objects.filter(title__contains=art.title).values('id', 'title')
+            if art_like :
+                for art in art_like:
+                    print art.artrely.count()
+                    art.relycount = art.artrely.count()
+            else:
+                search = '未搜索到与【<span style="color: #FF5722;">' + request.GET.get(u'keywords')  +'</span>】有关的文章，随便看看吧！'
+        else:
+            search = '休息一会儿再搜索吧'
+    # 随机文章
+    art_random = Article.objects.order_by('?').values('id', 'title')[:6]
+    return render(request, 'article.html', {
+        'announcement': announcement,
+        'articles': articles,
+        "topart": tmp_topart,
+        'art_like': art_like,
+        'search': search,
+        'art_rely':art_rely,
+        'art_random': art_random,
+        'art_cate': art_cate,
+        "websiteinfo": websiteinfo,
+        'protagonist': protagonist,
+        'timeline': timeline,
+        'ads': ads,
+    })
 
 #时光线 时间线
 def timeline(request):
@@ -217,6 +315,8 @@ def homenext(request):
         art_count = Article.objects.filter(isstick=0).count()
         if art_count%pagesize != 0:
             art_count = art_count/pagesize+ 1
+        else:
+            art_count = art_count / pagesize
         response_data = {}
         response_data['Data'] = articlecode(art)
         response_data['Success'] = True
@@ -265,7 +365,8 @@ def message(request):
             avatar = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
             response_data['avatar'] = avatar
             response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            GuestBook.objects.create(message=content,name= name, email=email, website=website, avatar=avatar)
+            aa = GuestBook.objects.create(message=content,name= name, email=email, website=website, avatar=avatar)
+            print aa , ";;" + aa.avatar + ";;;;;;;;" + aa.message
             print  name + '留言,成功'
             return JsonResponse(response_data)
         elif name != None and content != None and email != None and message_reply_id != None:

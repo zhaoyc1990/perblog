@@ -9,6 +9,7 @@
 layui.use(['element', 'layer', 'util', 'form'], function () {
     var element = layui.element();
     var $ = layui.jquery;
+    var form = layui.form();
     //模拟QQ登陆
     $('.blog-user').click(function () {
         var user = this;
@@ -35,6 +36,12 @@ layui.use(['element', 'layer', 'util', 'form'], function () {
      //监听导航点击
     element.on('nav(nav)', function (elem) {
 
+    });
+
+     //监听搜索提交
+    form.on('submit(formSearch)', function (data) {
+        document.location.href = "/article/search?keywords=" +data.field.keywords;
+        return false;
     });
 
     //子栏目导航点击事件
