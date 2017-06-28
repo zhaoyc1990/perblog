@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from welcome.views import index, health, temp, home, uploadImg, timeline, detail, homenext, articlerely, message
-from welcome.views import about, share, page_not_found, article
+from welcome.views import about, share, page_not_found, article, codeqq, qq, logout
 from django.conf.urls import handler404, handler500
 
 import settings
@@ -28,5 +28,8 @@ urlpatterns = [
     url(r'^api/message', message),
     url(r'^kin/uploadImg/$', uploadImg),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^login/qq', codeqq),
+    url(r'^api/logout', logout),
+    url(r'^qq', qq),
 ]
 urlpatterns += staticfiles_urlpatterns()

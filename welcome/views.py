@@ -5,11 +5,12 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.http import JsonResponse
 from . import database
-from .models import PageView, Announcement, Article, ArticleRely, TimeLine, GuestBook
+from .models import PageView, Announcement, Article, ArticleRely, TimeLine, GuestBook, Socialaccount, Socialuser
 from .models import Websiteinfo, Protagonist, Links, ArticleCategory, AccessBy, Share, Ad
 from .utils import articlecode, arttagstolist
+from qq import Qq
+from django import http
 from django.db.models import Q
-import datetime
 
 def index(request):
     hostname = os.getenv('HOSTNAME', 'unknown')
@@ -31,6 +32,7 @@ def temp(request):
 
 #首页
 def home(request):
+    user = auth_user(request)
     #网站信息
     websiteinfo = None
     websiteinfo_num = Websiteinfo.objects.count()
@@ -77,10 +79,13 @@ def home(request):
         'links': links,
         'timeline': timeline,
         'ads': ads,
+        'user':user,
 	})
 
 #文章列表
 def article(request):
+    user = auth_user(request)
+
     # 网站信息
     websiteinfo = None
     websiteinfo_num = Websiteinfo.objects.count()
@@ -174,10 +179,13 @@ def article(request):
         'protagonist': protagonist,
         'timeline': timeline,
         'ads': ads,
+        'user': user,
     })
 
 #时光线 时间线
 def timeline(request):
+    user = auth_user(request)
+
     # 网站信息
     websiteinfo = None
     websiteinfo_num = Websiteinfo.objects.count()
@@ -192,12 +200,15 @@ def timeline(request):
     return render(request, 'timeline.html', {
         'timelines':timelines,
         'websiteinfo': websiteinfo,
+        'user': user,
     })
 
 
 
 #文章内容展示页
 def detail(request, aid):
+    user = auth_user(request)
+
     # 网站信息
     websiteinfo = None
     websiteinfo_num = Websiteinfo.objects.count()
@@ -255,9 +266,12 @@ def detail(request, aid):
         'art_like': art_like[0:4],
         'art_random': art_random,
         'ads': ads,
+        'user': user,
     })
 
 def about(request):
+    user = auth_user(request)
+
     # 网站信息
     websiteinfo = None
     websiteinfo_num = Websiteinfo.objects.count()
@@ -266,11 +280,14 @@ def about(request):
         websiteinfo = Websiteinfo.objects.get()
     return render(request, 'about.html',{
         'websiteinfo': websiteinfo,
-        'guestbook': guestbook
+        'guestbook': guestbook,
+        'user': user,
     })
 
 #分享页面
 def share(request):
+    user = auth_user(request)
+
     # 网站信息
     websiteinfo = None
     websiteinfo_num = Websiteinfo.objects.count()
@@ -290,6 +307,7 @@ def share(request):
         'websiteinfo': websiteinfo,
         'shares': shares,
         'protagonist': protagonist,
+        'user': user,
     })
 
 
@@ -336,15 +354,26 @@ def articlerely(request):
         if artid != None and content != None:
             response_data = {}
             response_data['Success'] = True
-            response_data['avatar'] = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
+            openid = request.session.get('openid', None)
+            name = '未知'
+            try:
+                user = Socialuser.objects.get(qqopenid=openid)
+                response_data['avatar'] = user.photo
+                name = user.name
+            except Socialuser.DoesNotExist:
+                response_data['avatar'] = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
+            response_data['name'] = name
             response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
             art = Article()
             art.id = int(artid)
-            ArticleRely.objects.create(content=content, artid=art, name='未知', email='asdf@aa.com', photo=response_data['avatar'])
+
+            ArticleRely.objects.create(content=content, artid=art, name=name, email='asdf@aa.com', photo=response_data['avatar'])
             return JsonResponse(response_data)
 
     return JsonResponse({'Success': False})
 
+#网站留言
 def message(request):
     if request.method == 'POST':
         req_data = json.loads(request.body.decode())
@@ -357,7 +386,24 @@ def message(request):
         except KeyError:  # 获取数据 不完整时 ，返回错误
             print '网站首页留言，提交数据不完整', req_data
             return JsonResponse({'Success': False})
-        if name != None and content != None and email != None and message_reply_id == None:
+        user = Socialuser.objects.get(qqopenid=str(request.session.get('openid', None)))
+        user.email = email
+        user.website = website
+        user.save()
+        openid = request.session.get('openid', None)
+        if openid != None:
+            response_data = {}
+            response_data['Success'] = True
+            response_data['name'] = name
+            response_data['website'] = website
+            avatar = user.photo
+            response_data['avatar'] = avatar
+            response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            aa = GuestBook.objects.create(message=content, name=name, email=email, website=website, avatar=avatar)
+            print aa, ";;" + aa.avatar + ";;;;;;;;" + aa.message
+            print  name + '留言,成功'
+            return JsonResponse(response_data)
+        if name != '' and content != '' and email !='' and message_reply_id == None:
             response_data = {}
             response_data['Success'] = True
             response_data['name'] = name
@@ -369,7 +415,7 @@ def message(request):
             print aa , ";;" + aa.avatar + ";;;;;;;;" + aa.message
             print  name + '留言,成功'
             return JsonResponse(response_data)
-        elif name != None and content != None and email != None and message_reply_id != None:
+        elif name != '' and content != ''and email !='' and message_reply_id != None:
             response_data = {}
             response_data['Success'] = True
             response_data['name'] = name
@@ -382,7 +428,86 @@ def message(request):
             return JsonResponse(response_data)
     return JsonResponse({'Success': False})
 
+def codeqq(request):
+    if request.session.get('logout', None) == True:
+        request.session['logout'] = False
+        print '登陆状态更新为True'
+        return http.HttpResponseRedirect('/')
+    openid = request.session.get('openid', None)
+    com_qq = Socialaccount.objects.get(company='qq')
+    if com_qq == None:
+        return http.HttpResponseRedirect('/404')
+    qq = Qq(com_qq)
+    if openid == None:
+        qqurl = qq.get_code_url('test')
+        print 'qqurl:', qqurl
+        return http.HttpResponseRedirect(qqurl)
+    else:
+        try:
+            user = Socialuser.objects.get(qqopenid=str(openid))
+        except Socialuser.DoesNotExist:
+            return http.HttpResponseRedirect('/')
+        expires_in = request.session.get('expires_in', None)
+        #判断 accesstoken 是否过期 否则自动续期
+        if expires_in < int(time.time()):
+            user = qq.refresh_get_token(user.refresh_token, user)
+            request.session['expires_in'] = user.expires_in
+            request.session['accesstoken'] = user.access_token
 
+        data = qq.get_user_info(user.access_token, user.qqopenid)
+        user.photo = data.get('figureurl_qq_1') #QQ头像40*40
+        user.name = data.get('nickname')
+        print 'gender:', data.get('gender'), 'type():', type(data.get('gender'))
+        if data.get('gender') == u'男':
+            print u'u男'
+        if data.get('gender') == '男':
+            user.sex = 1
+        else:
+            user.sex = 0
+        user.save()
+        return http.HttpResponseRedirect('/')
+
+def qq(request):
+    com_qq = Socialaccount.objects.get(company='qq')
+    qq = Qq(com_qq)
+
+    code = qq.get_code(request)
+    print 'code', code
+    socialuser = qq.get_token(code)
+    if socialuser == None:
+        print '返回用户为空'
+    print socialuser
+    openid = qq.get_openid(socialuser.access_token)
+    request.session['openid'] = openid
+    print 'qq:', openid
+    data = qq.get_user_info(socialuser.access_token, openid)
+    request.session['accesstoken'] = socialuser.access_token
+    request.session['expires_in'] = socialuser.expires_in
+    try:
+        user = Socialuser.objects.get(qqopenid=openid)
+        socialuser.id = user.id
+    except Socialuser.DoesNotExist:
+        print '新用户登陆'
+    socialuser.name = data.get('nickname')
+    socialuser.city = data.get('city')
+    socialuser.photo = data.get('figureurl_qq_1')
+    socialuser.qqopenid = openid
+    print 'province:', data.get('province')
+    if data.get('gender') == u'男':
+        socialuser.sex = 1
+    else:
+        socialuser.sex = 0
+    print 'gender:', data.get('gender')
+    socialuser.save()
+
+    return http.HttpResponseRedirect('/')
+
+def logout(request):
+    if request.method == 'POST':
+        request.session['logout'] = True
+        dict_tmp = {}
+        dict_tmp['error'] = 0
+        return JsonResponse(dict_tmp)
 def mkdir(path):
     path = path.strip()
     path = path.rstrip("\\")
@@ -416,3 +541,38 @@ def uploadImg(request):
 
 def page_not_found(request):
     return render(request, '404.html')
+
+def auth_user(request):
+    if request.session.get('logout', None) == True:
+        return None
+    openid = request.session.get('openid', None)
+    user = None
+    if openid != None:
+        com_qq = Socialaccount.objects.get(company='qq')
+        if com_qq == None:
+            return http.HttpResponseRedirect('/404')
+        qq = Qq(com_qq)
+        print 'qq号:', openid, type(openid)
+        try:
+            user = Socialuser.objects.get(qqopenid=str(openid))
+
+            expires_in = request.session.get('expires_in', None)
+            # 判断 accesstoken 是否过期 否则自动续期
+            if expires_in < int(time.time()):
+                user = qq.refresh_get_token(user.refresh_token, user)
+                request.session['expires_in'] = user.expires_in
+                request.session['accesstoken'] = user.access_token
+                data = qq.get_user_info(user.access_token, user.openid)
+                user.photo = data.get('figureurl_qq_1')  # QQ头像40*40
+                user.name = data.get('nickname')
+                print 'gender:', data.get('gender'), 'type():', type(data.get('gender'))
+                if data.get('gender') == u'男':
+                    print u'u男'
+                if data.get('gender') == '男':
+                    user.sex = 1
+                else:
+                    user.sex = 0
+                user.save()
+        except Socialuser.DoesNotExist:
+            print '查询qqopenid为空'
+    return user

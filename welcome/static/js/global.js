@@ -11,13 +11,31 @@ layui.use(['element', 'layer', 'util', 'form'], function () {
     var $ = layui.jquery;
     var form = layui.form();
     //模拟QQ登陆
-    $('.blog-user').click(function () {
+    $('.user-logout').click(function () {
         var user = this;
         var index = layer.load(1);
-        setTimeout(function () {
-            layer.close(index);
-            $(user).toggleClass('layui-hide').siblings('a.blog-user').toggleClass('layui-hide');
-        }, 800);
+        $.ajax({
+            type: 'post',
+            url: '/api/logout',
+            contentType: 'application/json',
+            datatype: 'json',
+            success: function (res) {
+                layer.close(index);
+                console.log(res);
+                console.log(res.error);
+                if (res.error == 0){
+                    console.log('logout');
+                     $(user).toggleClass('layui-hide').siblings('a.blog-user').toggleClass('layui-hide');
+                }
+
+            },
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            error: function (e) {
+                layer.msg(e.responseText);
+            }
+        });
     });
     //分享工具
     layui.util.fixbar({

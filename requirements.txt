@@ -6,3 +6,4 @@ whitenoise==3.0
 Pillow==4.1.0
 django-thumbs==0.4
 MySQL-python
+simplejson==3.11.1
