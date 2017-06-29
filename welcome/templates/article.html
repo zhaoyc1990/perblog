@@ -153,7 +153,7 @@
                         <div class="blog-module-title">最新文章评论</div>
                         <ul class="fa-ul blog-module-ul">
                             {% for rely in art_rely %}
-                                <li><i class="fa-li fa fa-hand-o-right"></i><a href="/detail/{{ rely.id }}.html"> {% autoescape off %} {{ rely.content }} {% endautoescape %}</a></li>
+                                <li><i class="fa-li fa fa-hand-o-right"></i><a href="/detail/{{ rely.artid.id }}.html#commit_id{{ rely.id }}"> {% autoescape off %} {{ rely.content }} {% endautoescape %}</a></li>
                             {% endfor %}
                         </ul>
                     </div>

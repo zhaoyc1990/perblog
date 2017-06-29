@@ -78,7 +78,7 @@
                         <ul class="blog-comment">
                             <li>
                                 {% for art_ry in art_rely %}
-                                <div class="comment-parent">
+                                <div class="comment-parent" id="commit_id{{ art_ry.id }}">
                                     <img src="{{ art_ry.photo }}" alt="absolutely" />
                                     <div class="info">
                                         <span class="username">{{ art_ry.name }}</span>
