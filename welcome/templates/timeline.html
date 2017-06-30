@@ -27,6 +27,7 @@
     <link href="/static/css/timeline.css" rel="stylesheet" />
 </head>
 <body>
+{% csrf_token %}
     <!-- 导航 -->
     {% include 'welcome/nav.html' %}
     <!-- 主体（一般只改变这里的内容） -->

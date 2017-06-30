@@ -5,7 +5,8 @@
 @Site：http://www.lyblogs.cn
 
 */
-
+var csrfitems = document.getElementsByName("csrfmiddlewaretoken");
+var csrftoken = csrfitems[0].value;
 layui.use(['element', 'layer', 'util', 'form'], function () {
     var element = layui.element();
     var $ = layui.jquery;

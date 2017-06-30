@@ -36,7 +36,7 @@
         <div class="blog-container">
             <blockquote class="layui-elem-quote sitemap layui-breadcrumb shadow">
                 <a href="/home" title="网站首页">网站首页</a>
-                <a href="javascript:;" class="construction" title="文章专栏">文章专栏</a>
+                <a href="/article" title="文章专栏">文章专栏</a>
                 <a><cite>{{ art.title }}</cite></a>
             </blockquote>
             <div class="blog-main">
@@ -58,6 +58,19 @@
 
                         </div>
                     </div>
+
+                    <!-- 广告位置 -->
+                    <div class="article-detail shadow" style="padding:10px 7px">
+                        {% for ad in ads %}
+                            {% if ad.position == 'footer' %}
+                                {% autoescape off %}
+                                    {{ ad.content }}
+                                {% endautoescape %}
+
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
                     <!-- 评论区域 -->
                     <div class="blog-module shadow" style="box-shadow: 0 1px 8px #a6a6a6;">
                         <fieldset class="layui-elem-field layui-field-title" style="margin-bottom:0">

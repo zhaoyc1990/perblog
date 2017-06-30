@@ -429,16 +429,14 @@ def message(request):
     return JsonResponse({'Success': False})
 
 def codeqq(request):
-    if request.session.get('logout', None) == True:
-        request.session['logout'] = False
-        print '登陆状态更新为True'
-        return http.HttpResponseRedirect('/')
+
     openid = request.session.get('openid', None)
-    com_qq = Socialaccount.objects.get(company='qq')
-    if com_qq == None:
+    try:
+        com_qq = Socialaccount.objects.get(company='qq')
+    except Socialaccount.DoesNotExist:
         return http.HttpResponseRedirect('/404')
     qq = Qq(com_qq)
-    if openid == None:
+    if openid == None or openid == '':
         qqurl = qq.get_code_url('test')
         print 'qqurl:', qqurl
         return http.HttpResponseRedirect(qqurl)
@@ -446,7 +444,12 @@ def codeqq(request):
         try:
             user = Socialuser.objects.get(qqopenid=str(openid))
         except Socialuser.DoesNotExist:
-            return http.HttpResponseRedirect('/')
+            qqurl = qq.get_code_url('test')
+            print 'qqurl:', qqurl
+            request.session['logout'] = False
+            print '登陆状态更新为True'
+            return http.HttpResponseRedirect(qqurl)
+
         expires_in = request.session.get('expires_in', None)
         #判断 accesstoken 是否过期 否则自动续期
         if expires_in < int(time.time()):
@@ -465,6 +468,9 @@ def codeqq(request):
         else:
             user.sex = 0
         user.save()
+        if request.session.get('logout', None) == True:
+            request.session['logout'] = False
+            print '登陆状态更新为True'
         return http.HttpResponseRedirect('/')
 
 def qq(request):
@@ -483,11 +489,14 @@ def qq(request):
     data = qq.get_user_info(socialuser.access_token, openid)
     request.session['accesstoken'] = socialuser.access_token
     request.session['expires_in'] = socialuser.expires_in
+    user = None
     try:
         user = Socialuser.objects.get(qqopenid=openid)
         socialuser.id = user.id
     except Socialuser.DoesNotExist:
         print '新用户登陆'
+    if user == None:
+        user = Socialuser()
     socialuser.name = data.get('nickname')
     socialuser.city = data.get('city')
     socialuser.photo = data.get('figureurl_qq_1')
