@@ -386,10 +386,16 @@ def message(request):
         except KeyError:  # 获取数据 不完整时 ，返回错误
             print '网站首页留言，提交数据不完整', req_data
             return JsonResponse({'Success': False})
-        user = Socialuser.objects.get(qqopenid=str(request.session.get('openid', None)))
-        user.email = email
-        user.website = website
-        user.save()
+        if website != None:
+            if website[:7] != 'http://':
+                website = 'http://' + website
+        try:
+            user = Socialuser.objects.get(qqopenid=str(request.session.get('openid', None)))
+            user.email = email
+            user.website = website
+            user.save()
+        except Socialuser.DoesNotExist:
+            pass
         openid = request.session.get('openid', None)
         if openid != None:
             response_data = {}
@@ -400,32 +406,34 @@ def message(request):
             response_data['avatar'] = avatar
             response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             aa = GuestBook.objects.create(message=content, name=name, email=email, website=website, avatar=avatar)
-            print aa, ";;" + aa.avatar + ";;;;;;;;" + aa.message
+            print aa, ";;" + aa.avatar + ";;;;;;;;" + aa.message + ',website:' + website
             print  name + '留言,成功'
             return JsonResponse(response_data)
-        if name != '' and content != '' and email !='' and message_reply_id == None:
-            response_data = {}
-            response_data['Success'] = True
-            response_data['name'] = name
-            response_data['website'] = website
+        if request.session.get('avatar', None) == None:
             avatar = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
-            response_data['avatar'] = avatar
-            response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        else:
+            avatar = request.session.get('avatar')
+        if name != '' and content != '' and email !='' and message_reply_id == None:
             aa = GuestBook.objects.create(message=content,name= name, email=email, website=website, avatar=avatar)
             print aa , ";;" + aa.avatar + ";;;;;;;;" + aa.message
             print  name + '留言,成功'
-            return JsonResponse(response_data)
         elif name != '' and content != ''and email !='' and message_reply_id != None:
-            response_data = {}
-            response_data['Success'] = True
-            response_data['name'] = name
-            response_data['website'] = website
-            avatar = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
-            response_data['avatar'] = avatar
-            response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             GuestBook.objects.create(message=content, name=name, email=email, messagerely_id= message_reply_id, website=website, avatar=avatar)
             print name + '留言,成功,回复ID:', message_reply_id
-            return JsonResponse(response_data)
+        response_data = {}
+        response_data['Success'] = True
+        response_data['name'] = name
+        response_data['email'] = email
+        response_data['website'] = website
+        response_data['avatar'] = avatar
+        response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+        request.session['name'] = name
+        request.session['email'] = email
+        request.session['website'] = website
+        request.session['avatar'] = avatar
+
+        return JsonResponse(response_data)
     return JsonResponse({'Success': False})
 
 def codeqq(request):
@@ -584,4 +592,10 @@ def auth_user(request):
                 user.save()
         except Socialuser.DoesNotExist:
             print '查询qqopenid为空'
+    if user == None:
+        user = Socialuser()
+        user.name = request.session.get('name', '')
+        user.email = request.session.get('email', '')
+        user.website = request.session.get('website', '')
+        user.uploadphoto = request.session.get('avatar', '')
     return user
