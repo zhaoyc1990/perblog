@@ -77,7 +77,18 @@
                             <legend>来说两句吧</legend>
                             <div class="layui-field-box">
                                 <form class="layui-form blog-editor" action="">
-
+                                    <div class="layui-form-item">
+                                        <label for="author" class="aboutinfo-location">姓名 <span class="required  ">*</span></label>
+                                        <input id="author" class="layui-input" name="name" type="text" value="{% if user.name %}{{ user.name }}{% else %}{% endif %}"  size="30" maxlength="245" aria-required="true" required="required">
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label for="author" class="aboutinfo-location">邮箱 <span class="required  ">*</span></label>
+                                        <input id="author" class="layui-input" name="email" type="text" value="{% if user.email %}{{ user.email }}{% else %}{% endif %}"  size="30" maxlength="245" aria-required="true" required="required">
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label for="author" class="aboutinfo-location">网址 <span class="required  "></span></label>
+                                        <input id="author" class="layui-input" name="website" type="text" value="{% if user.website %}{{ user.website }}{% else %}{% endif %}"  size="30" maxlength="245" aria-required="true" required="required">
+                                    </div>
                                     <div class="layui-form-item">
                                         <textarea name="editorContent" lay-verify="content" id="remarkEditor" placeholder="请输入内容" class="layui-textarea layui-hide"></textarea>
                                     </div>
@@ -89,22 +100,92 @@
                         </fieldset>
                         <div class="blog-module-title">最新评论</div>
                         <ul class="blog-comment">
+                        {% for art_ry in art_rely %}
                             <li>
-                                {% for art_ry in art_rely %}
                                 <div class="comment-parent" id="commit_id{{ art_ry.id }}">
-                                    <img src="{{ art_ry.photo }}" alt="absolutely" />
-                                    <div class="info">
-                                        <span class="username">{{ art_ry.name }}</span>
-                                        <span class="time">{{ art_ry.timemodify }}</span>
-                                    </div>
+                                    {% if art_ry.socialuser %}
+                                        <img src="{{ art_ry.socialuser.photo }}" alt="absolutely" />
+                                        <div class="info">
+                                        {% if art_ry.socialuser.website %}
+                                            <a target="_blank" href="{{ art_ry.socialuser.website }}">
+                                                <span class="username">{{ art_ry.socialuser.name }}</span>
+                                            </a>
+                                        {% else %}
+                                             <span class="username">{{ art_ry.socialuser.name }}</span>
+                                        {% endif %}
+                                            <span class="time">{{ art_ry.timemodify }}</span>
+                                        </div>
+                                    {% else %}
+                                        <img src="{{ art_ry.photo }}" alt="{{ art_ry.name }}" />
+                                        <div class="info">
+                                        <a target="_blank" href="{{ art_ry.website }}">
+                                            <span class="username">{{ art_ry.name }}</span>
+                                        </a>
+                                            <span class="time">{{ art_ry.timemodify }}</span>
+                                        </div>
+                                    {% endif %}
+
                                     <div class="content">
                                         {% autoescape off %}
                                             {{ art_ry.content }}
                                         {% endautoescape %}
                                     </div>
+                                    <p class="info info-footer"><span class="time">{{ mes.timestamp | date:"Y-m-j H:i" }}</span><a class="btn-reply" href="javascript:;" onclick="btnReplyClick(this)">回复</a></p>
                                 </div>
-                                {% endfor %}
+                                    <hr/>
+                                    {% for art_rely in art_ry.reply %}
+                                        <div class="comment-child">
+                                            {% if art_rely.socialuser %}
+                                                <img src="{{ art_rely.socialuser.photo }}" alt="{{ art_rely.socialuser.name }}" />
+                                                <div class="info">
+                                                {% if art_rely.socialuser.website %}
+                                                    <a target="_blank" href="{{ art_rely.socialuser.website }}">
+                                                        <span class="username">{{ art_rely.socialuser.name }}</span>
+                                                    </a>
+                                                {% else %}
+                                                     <span class="username">{{ art_rely.socialuser.name }}</span>
+                                                {% endif %}
+                                                    <span class="time">{{ art_rely.timemodify }}</span>
+                                                </div>
+                                            {% else %}
+                                                <img src="{{ art_rely.photo }}" alt="{{ art_rely.name }}" />
+                                                <div class="info">
+                                                {% if art_rely.website %}
+                                                    <a target="_blank" href="{{ art_rely.website }}"><span class="username">{{ art_rely.name }}</span></a>
+                                                {% else %}
+                                                    <span class="username">{{ art_rely.name }}</span>
+                                                {% endif %}
+                                                    <span class="time">{{ art_ry.timemodify }}</span>
+                                                </div>
+                                            {% endif %}
+                                                <div class="content">
+                                                    <span>{% autoescape off %}
+                                                        {{ art_rely.content }}
+                                                    {% endautoescape %}</span>
+                                                </div>
+                                        </div>
+
+                                    {% endfor %}
+                                <div class="replycontainer layui-hide">
+                                    <form class="layui-form" action="">
+                                        <input class="layui-hide" name="replyid" value="{{ art_ry.id }}"/>
+                                        <input class="layui-hide" name="replyid" value="{{ art_ry.id }}"/>
+                                        <div class="layui-input-inline user-info" style="width:49%;"><input type="text" name="username" placeholder="名字" value="{% if user.name %}{{ user.name }}{% else %}{% endif %}" class="layui-input" ></div>
+
+                                        <div class="layui-input-inline user-info" style="width:50%;"><input type="text" name="email" placeholder="邮箱" value="{% if user.email %}{{ user.email }}{% else %}{% endif %}" class="layui-input"></div>
+                                        <div class="layui-form-item user-info">
+                                            <input name="website"  type="text"  lay-verify="replyContent" placeholder="您的网址" value="{% if user.website %}{{ user.website }}{% else %}{% endif %}" class="layui-input" />
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <textarea name="replyContent" lay-verify="replyContent" placeholder="请输入回复内容" class="layui-textarea" style="min-height:80px;"></textarea>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <button class="layui-btn layui-btn-mini" lay-submit="formReply" lay-filter="formReply">提交</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </li>
+                        {% endfor %}
                         </ul>
                     </div>
                 </div>

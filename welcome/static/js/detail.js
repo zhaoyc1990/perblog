@@ -26,21 +26,24 @@ layui.use(['form', 'layedit'], function () {
             layedit.sync(editIndex);
         }
     });
-
     //监听评论提交
     form.on('submit(formRemark)', function (data) {
         var index = layer.load(1);
         var artid = $("#artid").text()
+        var name = data.field.name;
+        var email = data.field.email;
+        var website = data.field.website;
         //模拟评论提交
         $.ajax({
             type: 'post',
             url: '/api/article/rely',
             contentType: 'application/json',
-            data: JSON.stringify({ "content": data.field.editorContent, "artid": artid}),
+            data: JSON.stringify({ "content": data.field.editorContent, "artid": artid, "name": name, "email": email, "website": website}),
             datatype: 'json',
             success: function (res) {
+                layer.close(index);
                 if (res.Success) {
-                    formadd(index, data.field.editorContent, res.avatar, res.name, res.time)
+                    formadd( data.field.editorContent,res)
                 } else {
                     layer.msg('评论失败', { icon: 2 });
                 }
@@ -56,14 +59,18 @@ layui.use(['form', 'layedit'], function () {
     });
 
     //data 提交的内容，avatar头像
-    function formadd(index, data, avatar, name, time) {
-        layer.close(index);
+    function formadd( data, res) {
+
         //var content = data.field.editorContent;
         var content = data
         if (typeof(name) == 'undefined' || name == ''){
             name = '未知'
         }
-        var html = '<li><div class="comment-parent"><img src="' + avatar + '"alt="absolutely"/><div class="info"><span class="username">'+ name +'</span><span class="time">' + time +'</span></div><div class="content">' + content + '</div></div></li>';
+        if (res.website == '') {
+            var html = '<li><div class="comment-parent"><img src="' + res.avatar + '"alt="absolutely"/><div class="info"><span class="username">'+ res.name +'</span><span class="time">' + res.time +'</span></div><div class="content">' + res.content + '</div></div></li>';
+        } else {
+            var html = '<li><div class="comment-parent"><img src="' + res.avatar + '"alt="absolutely"/><div class="info"><a target="_blank" href="' + res.website +'"> <span class="username">'+ res.name +'</span></a><span class="time">' + res.time +'</span></div><div class="content">' + res.content + '</div></div></li>';
+        }
         $('.blog-comment').append(html);
         $('#remarkEditor').val('');
         editIndex = layui.layedit.build('remarkEditor', {
@@ -72,4 +79,55 @@ layui.use(['form', 'layedit'], function () {
         });
         layer.msg("评论成功", { icon: 1 });
     }
+    //监听留言回复提交
+    form.on('submit(formReply)', function (data) {
+        var index = layer.load(1);
+        var art_reply_id = data.field.replyid;
+        var message = data.field.replyContent;
+        var name = data.field.username;
+        var website = data.field.website;
+        var email = data.field.email;
+        $.ajax({
+            type: 'post',
+            url: '/api/article/rely',
+            contentType: 'application/json',
+            data: JSON.stringify({ "art_rely": art_reply_id, "content": message, "name": name, "email": email, "website": website, "artid":0}),
+            datatype: 'json',
+            success: function (res) {
+                layer.close(index);
+                if (res.Success) {
+                    if (res.website == ""){
+                        var html = '<div class="comment-child"><img src="' + res.avatar +'"alt="Absolutely"/><div class="info"><span class="username">' + res.name + '</span><span>' + message + '</span></div><p class="info"><span class="time">'+ res.time + '</span></p></div>';
+
+                    } else {
+                        var html = '<div class="comment-child"><img src="' + res.avatar +'"alt="Absolutely"/><div class="info"><a target="_blank" href="' + res.website +'" <span class="username">' + res.name + '</span></a><span>' + message + '</span></div><p class="info"><span class="time">'+ res.time + '</span></p></div>';
+
+                    }
+                    $(data.form).find('textarea').val('');
+                    $(data.form).find('.user-info').val('');
+                    $(data.form).parent('.replycontainer').before(html).siblings('.comment-parent').children('p').children('a').click();
+                    layer.msg("回复成功", { icon: 1 });
+                } else {
+                    layer.msg("<span style='color:#777777;'>评论失败</span>", { icon: 2 });
+                }
+            },
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            error: function (e) {
+                layer.msg(e.responseText);
+            }
+        });
+        return false;
+    });
+
 });
+function btnReplyClick(elem) {
+    var $ = layui.jquery;
+    $(elem).parent('p').parent('.comment-parent').siblings('.replycontainer').toggleClass('layui-hide');
+    if ($(elem).text() == '回复') {
+        $(elem).text('收起')
+    } else {
+        $(elem).text('回复')
+    }
+}

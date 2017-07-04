@@ -21,6 +21,7 @@ class GuestBook(models.Model):
 	email = models.CharField('留言者邮箱', max_length=80,default=None)
 	message = models.TextField('留言内容', max_length=500)
 	website = models.CharField('网站地址', max_length=200,blank=True, null=True)
+	review = models.BooleanField('是否审核通过', default=False)
 	timemodify = models.DateTimeField(auto_now=True)    #修改时间
 	timestamp = models.DateTimeField(auto_now_add=True)	#创建时间
 
@@ -96,15 +97,77 @@ class AccessBy(models.Model):
 	class Meta:
 		verbose_name_plural = verbose_name = 'IP记录'
 
+class Socialaccount(models.Model):
+	COMPANY_CHOICES = (
+		('qq', 'QQ'),
+	)
+	company = models.CharField('软件厂商(名称)', max_length=50, choices=COMPANY_CHOICES)
+	appid = models.CharField('appid', max_length=100)
+	appkey = models.CharField('appkey', max_length=100)
+	redirect_url = models.CharField('回调地址', max_length=100)
+	code_url = models.CharField('获取Authorization Code url', max_length=100, blank=True, null=True)
+	token_url = models.CharField('获取Access Token url', max_length=100, blank=True, null=True)
+
+	def __unicode__(self):
+		return self.company
+
+	def __str__(self):
+		return self.company
+
+	class Meta:
+		verbose_name_plural = verbose_name = '社交登陆互联'
+
+class Socialuser(models.Model):
+	SEX = (
+		(0, '女'),
+		(1, '男'),
+	)
+	username = models.CharField('用户名', max_length=100, blank=True, null=True)
+	name = models.CharField('昵称', max_length=100, blank=True, null=True)
+	password = models.CharField('密码', max_length=100, blank=True, null=True)
+	website = models.CharField('首页网址', max_length=100, blank=True, null=True)
+	email = models.CharField('邮箱', max_length=100, blank=True, null=True)
+	sex = models.IntegerField('性别', choices=SEX, default=1)
+	city = models.CharField('城市', max_length=30, blank=True, null=True)
+	qqopenid = models.CharField('qq唯一标识', max_length=100, blank=True, null=True)
+	photo = models.CharField('头像地址', max_length=100, blank=True, null=True)
+	uploadphoto = ImageWithThumbsField('头像', upload_to=generate_filename,
+									   default='static/article/Thumbnails/no-img.jpg', sizes=((100, 100),),
+									   blank=True, null=True)
+	access_token = models.CharField('访问access_token', max_length=100, blank=True, null=True)
+	refresh_token = models.CharField('自动续期token', max_length=100, blank=True, null=True)
+	expires_in = models.IntegerField('token过期时间戳', blank=True, null=True)
+	qq = models.CharField('QQ号', max_length=14, blank=True, null=True)
+	weibo = models.CharField('微博号', max_length=50, blank=True, null=True)
+	github = models.CharField('github帐号', max_length=100, blank=True, null=True)
+	social = models.ForeignKey(Socialaccount, related_name='user', verbose_name='社交厂商', blank=True, null=True)
+
+	def __unicode__(self):
+		if self.name == None:
+			return '(无名)'
+		return self.name
+
+	def __str__(self):
+		if self.name == None:
+			return '(无名)'
+		return self.name
+
+	class Meta:
+		verbose_name_plural = verbose_name = '社交登陆互联用户'
+
+
 #文章评论及评论回复
 class ArticleRely(models.Model):
 	artid = models.ForeignKey(Article,related_name='artrely',verbose_name='评论文章', blank=True, null=True)
 	commentid = models.ForeignKey('self',related_name='arirely', verbose_name='回复id',blank=True, null=True)
+	socialuser = models.ForeignKey(Socialuser, related_name='relyuser', verbose_name='社交用户', blank=True, null=True)
 	commentip = models.ForeignKey(AccessBy, related_name='artrely', verbose_name='回复ip', blank=True, null=True)
 	photo = models.CharField('随机头像',max_length=100, blank=True, null=True)
 	name = models.CharField('评论者名称', max_length=50)  # 评论者名称
 	email = models.CharField('评论者邮箱', max_length=80, blank=True, null=True)
+	website = models.CharField('评论者网站', max_length=100, blank=True, null=True)
 	content = models.TextField('评论内容', max_length=500)
+	review = models.BooleanField('是否审核通过', default=False)
 	timemodify = models.DateTimeField(auto_now=True)  # 修改时间
 	timestamp = models.DateTimeField(auto_now_add=True)  # 创建时间
 
@@ -112,6 +175,8 @@ class ArticleRely(models.Model):
 		return self.name
 	def __str__(self):
 		return self.name
+	def reply(self):
+		return self.arirely.all()
 	class Meta:
 		verbose_name_plural = verbose_name = '文章评论及评论回复'
 
@@ -243,52 +308,3 @@ class Ad(models.Model):
 	class Meta:
 		verbose_name_plural = verbose_name = '广告代码'
 
-class Socialaccount(models.Model):
-    COMPANY_CHOICES = (
-        ('qq', 'QQ'),
-    )
-    company = models.CharField('软件厂商(名称)', max_length=50, choices=COMPANY_CHOICES)
-    appid = models.CharField('appid', max_length=100)
-    appkey = models.CharField('appkey', max_length=100)
-    redirect_url = models.CharField('回调地址', max_length=100)
-    code_url = models.CharField('获取Authorization Code url', max_length=100 , blank=True, null=True)
-    token_url = models.CharField('获取Access Token url', max_length=100 , blank=True, null=True)
-    def __unicode__(self):
-        return self.company
-    def __str__(self):
-        return self.company
-    class Meta:
-        verbose_name_plural = verbose_name = '社交登陆互联'
-
-class Socialuser(models.Model):
-	SEX = (
-		(0, '女'),
-		(1, '男'),
-	)
-	username = models.CharField('用户名', max_length=100, blank=True, null=True)
-	name = models.CharField('昵称', max_length=100, blank=True, null=True)
-	password = models.CharField('密码', max_length=100, blank=True, null=True)
-	website = models.CharField('首页网址', max_length=100, blank=True, null=True)
-	email = models.CharField('邮箱', max_length=100, blank=True, null=True)
-	sex =	models.IntegerField('性别', choices=SEX, default=1)
-	city = models.CharField('城市', max_length=30, blank=True, null=True)
-	qqopenid = models.CharField('qq唯一标识', max_length=100, blank=True, null=True)
-	photo = models.CharField('头像地址', max_length=100, blank=True, null=True)
-	uploadphoto = ImageWithThumbsField('头像',upload_to=generate_filename, default='static/article/Thumbnails/no-img.jpg', sizes=((100,100),), blank=True, null=True)
-	access_token = models.CharField('访问access_token', max_length=100, blank=True, null=True)
-	refresh_token = models.CharField('自动续期token', max_length=100, blank=True, null=True)
-	expires_in = models.IntegerField('token过期时间戳', blank=True, null=True)
-	qq = models.CharField('QQ号', max_length=14, blank=True, null=True)
-	weibo = models.CharField('微博号', max_length=50, blank=True, null=True)
-	github = models.CharField('github帐号', max_length=100, blank=True, null=True)
-	social = models.ForeignKey(Socialaccount,  related_name='user', verbose_name='社交厂商', blank=True, null=True)
-	def __unicode__(self):
-		if self.name == None:
-			return '(无名)'
-		return self.name
-	def __str__(self):
-		if self.name == None:
-			return '(无名)'
-		return self.name
-	class Meta:
-		verbose_name_plural = verbose_name = '社交登陆互联用户'

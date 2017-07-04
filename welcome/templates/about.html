@@ -189,7 +189,12 @@
                                                     <div class="comment-parent">
                                                         <img src="{{ mes.avatar }}" alt="{{ mes.name }}" />
                                                         <div class="info">
-                                                         <a target="_blank" href="{{ mes.website }}">   <span class="username">{{ mes.name }}</span></a>
+                                                            {% if mes.website %}
+                                                                <a target="_blank" href="{{ mes.website }}"> </a>
+
+                                                            {% else %}
+                                                                <span class="username">{{ mes.name }}</span>
+                                                            {% endif %}
                                                         </div>
                                                         <div class="content">
                                                             {% autoescape off %}
@@ -203,7 +208,12 @@
                                                         <div class="comment-child">
                                                             <img src="{{ mesch.avatar }}" alt="{{ mesch.name }}" />
                                                             <div class="info">
-                                                                <span class="username">{{ mesch.name }}</span><span>{% autoescape off %}
+                                                            {% if mesch.website %}
+                                                                <a target="_blank" href="{{ mesch.website }}"><span class="username">{{ mesch.name }}</span></a>
+                                                            {% else %}
+                                                                <span class="username">{{ mesch.name }}</span>
+                                                            {% endif %}
+                                                                <span>{% autoescape off %}
                                                                 {{ mesch.message }}
                                                             {% endautoescape %}</span>
                                                             </div>

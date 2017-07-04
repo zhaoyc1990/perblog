@@ -117,7 +117,7 @@ def article(request):
         print art.artrely.count()
         art.relycount = art.artrely.count()
     #最新文章评论
-    art_rely = ArticleRely.objects.all()[0:6]
+    art_rely = ArticleRely.objects.filter(commentid=None).order_by('-timestamp')[0:6]
 
     #搜索
     search = None
@@ -275,7 +275,7 @@ def about(request):
     # 网站信息
     websiteinfo = None
     websiteinfo_num = Websiteinfo.objects.count()
-    guestbook = GuestBook.objects.all()[0:7]
+    guestbook = GuestBook.objects.filter(messagerely=None)[0:7]
     if websiteinfo_num > 0:
         websiteinfo = Websiteinfo.objects.get()
     return render(request, 'about.html',{
@@ -343,32 +343,67 @@ def homenext(request):
     else:
         return JsonResponse({'Success':False})
 
+#文章评论
 def articlerely(request):
     if request.method == 'POST':
         req_data = json.loads(request.body.decode())
         try:
-            artid = req_data['artid']
+            artid = req_data.get('artid', None)
+            art_rely = req_data.get('art_rely', None)
             content = req_data['content']
+            name = req_data['name']
+            email = req_data['email']
+            website = req_data.get('website', None)
         except KeyError:  # 获取数据 不完整时 ，返回错误
             return JsonResponse({'Success': False})
+        if website != None and website != '':
+            if website[:7] != 'http://':
+                website = 'http://' + website
         if artid != None and content != None:
             response_data = {}
             response_data['Success'] = True
             openid = request.session.get('openid', None)
-            name = '未知'
+            user = None
             try:
-                user = Socialuser.objects.get(qqopenid=openid)
-                response_data['avatar'] = user.photo
-                name = user.name
+
+                if request.session.get('logout',None) == False or request.session.get('logout',None) == None:
+                    user = Socialuser.objects.get(qqopenid=openid)
+                    response_data['avatar'] = user.photo
+                    user.email = email
+                    if website != None:
+                        user.website = website
+                    user.save()
+                else:
+                    raise Socialuser.DoesNotExist
             except Socialuser.DoesNotExist:
-                response_data['avatar'] = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
+                if request.session.get('avatar', None):
+                    response_data['avatar'] = request.session.get('avatar', None)
+                else:
+                    avatar = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
+                    request.session['avatar'] = avatar
+                    response_data['avatar'] = avatar
+            request.session['name'] = name
+            request.session['email'] = email
+            if website!= None and website != '':
+                request.session['website'] = website
+            response_data['content'] = content
+            response_data['website'] = website
             response_data['name'] = name
             response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            if artid == 0:
+                art = None
+            else:
+                art = Article()
+                art.id = int(artid)
+            if user != None:
+                ArticleRely.objects.create(content=content, artid=art, socialuser = user,
+                                           photo=response_data['avatar'], commentid_id=art_rely)
+                print '社交用户回复成功'
+            else:
+                ArticleRely.objects.create(content=content, artid=art, name=name, email=email, website=website,
+                                           photo=response_data['avatar'], commentid_id=art_rely)
+                print '游客用户回复成功'
 
-            art = Article()
-            art.id = int(artid)
-
-            ArticleRely.objects.create(content=content, artid=art, name=name, email='asdf@aa.com', photo=response_data['avatar'])
             return JsonResponse(response_data)
 
     return JsonResponse({'Success': False})
@@ -386,18 +421,22 @@ def message(request):
         except KeyError:  # 获取数据 不完整时 ，返回错误
             print '网站首页留言，提交数据不完整', req_data
             return JsonResponse({'Success': False})
-        if website != None:
+        if website != None and website != '':
             if website[:7] != 'http://':
                 website = 'http://' + website
+        user = None
         try:
-            user = Socialuser.objects.get(qqopenid=str(request.session.get('openid', None)))
-            user.email = email
-            user.website = website
-            user.save()
+            if request.session.get('logout', None) == False or request.session.get('logout', None) == None:
+                user = Socialuser.objects.get(qqopenid=str(request.session.get('openid', None)))
+                user.email = email
+                user.website = website
+                user.save()
+            else:
+                raise Socialuser.DoesNotExist
         except Socialuser.DoesNotExist:
             pass
         openid = request.session.get('openid', None)
-        if openid != None:
+        if openid != None and request.session.get('logout', None) == False or request.session.get('logout', None) == None:
             response_data = {}
             response_data['Success'] = True
             response_data['name'] = name
@@ -405,7 +444,7 @@ def message(request):
             avatar = user.photo
             response_data['avatar'] = avatar
             response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            aa = GuestBook.objects.create(message=content, name=name, email=email, website=website, avatar=avatar)
+            aa = GuestBook.objects.create(message=content, name=name, email=email, website=website, avatar=avatar,messagerely_id= message_reply_id)
             print aa, ";;" + aa.avatar + ";;;;;;;;" + aa.message + ',website:' + website
             print  name + '留言,成功'
             return JsonResponse(response_data)
@@ -413,13 +452,8 @@ def message(request):
             avatar = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
         else:
             avatar = request.session.get('avatar')
-        if name != '' and content != '' and email !='' and message_reply_id == None:
-            aa = GuestBook.objects.create(message=content,name= name, email=email, website=website, avatar=avatar)
-            print aa , ";;" + aa.avatar + ";;;;;;;;" + aa.message
-            print  name + '留言,成功'
-        elif name != '' and content != ''and email !='' and message_reply_id != None:
-            GuestBook.objects.create(message=content, name=name, email=email, messagerely_id= message_reply_id, website=website, avatar=avatar)
-            print name + '留言,成功,回复ID:', message_reply_id
+        GuestBook.objects.create(message=content, name=name, email=email, messagerely_id= message_reply_id, website=website, avatar=avatar)
+        print name + '留言,成功,回复ID:', message_reply_id
         response_data = {}
         response_data['Success'] = True
         response_data['name'] = name
@@ -561,7 +595,12 @@ def page_not_found(request):
 
 def auth_user(request):
     if request.session.get('logout', None) == True:
-        return None
+        user = Socialuser()
+        user.name = request.session.get('name', '')
+        user.email = request.session.get('email', '')
+        user.website = request.session.get('website', '')
+        user.uploadphoto = request.session.get('avatar', '')
+        return user
     openid = request.session.get('openid', None)
     user = None
     if openid != None:

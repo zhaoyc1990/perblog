@@ -2,7 +2,7 @@
         <div class="blog-container">
             <!-- QQ互联登陆 -->
             {% if user %}
-                {% if user.openid %}
+                {% if user.qqopenid %}
                 <a href="javascript:;" class="blog-user user-logout">
                     <img src="{{ user.photo }}" alt="{{ user.name }}" title="{{ user.name }}" />
                 </a>
@@ -11,12 +11,12 @@
                     <i class="fa fa-qq"></i>
                 </a>
                 {% else %}
-                     <a href="login/qq" class="blog-user">
+                     <a href="/login/qq" class="blog-user">
                         <i class="fa fa-qq"></i>
                     </a>
                 {% endif %}
             {% else %}
-                <a href="login/qq" class="blog-user">
+                <a href="/login/qq" class="blog-user">
                     <i class="fa fa-qq"></i>
                 </a>
             {% endif %}
