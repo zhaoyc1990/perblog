@@ -32,6 +32,10 @@ def temp(request):
 
 #首页
 def home(request):
+    if request.user.id != None:
+        print '用户是否存在:' ,request.user.id, '用户邮箱:', request.user.email, '用户名字:', request.user.last_name+ request.user.first_name
+    else:
+        print '游客'
     user = auth_user(request)
     #网站信息
     websiteinfo = None
@@ -425,24 +429,26 @@ def message(request):
             if website[:7] != 'http://':
                 website = 'http://' + website
         user = None
+        openid = request.session.get('openid', None)
         try:
-            if request.session.get('logout', None) == False or request.session.get('logout', None) == None:
+            if openid != None:
                 user = Socialuser.objects.get(qqopenid=str(request.session.get('openid', None)))
                 user.email = email
                 user.website = website
                 user.save()
             else:
-                raise Socialuser.DoesNotExist
+                print '非社交互联用户'
         except Socialuser.DoesNotExist:
+            print '没此用户'
             pass
-        openid = request.session.get('openid', None)
-        if openid != None and request.session.get('logout', None) == False or request.session.get('logout', None) == None:
+
+        #qq互联登陆用户
+        if openid != None and request.session.get('logout', None) != True:
             response_data = {}
             response_data['Success'] = True
             response_data['name'] = name
             response_data['website'] = website
-            avatar = user.photo
-            response_data['avatar'] = avatar
+            response_data['avatar'] = user.photo
             response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             aa = GuestBook.objects.create(message=content, name=name, email=email, website=website, avatar=avatar,messagerely_id= message_reply_id)
             print aa, ";;" + aa.avatar + ";;;;;;;;" + aa.message + ',website:' + website
@@ -594,6 +600,20 @@ def page_not_found(request):
     return render(request, '404.html')
 
 def auth_user(request):
+    if request.user.id != None:
+        user = Socialuser()
+        user.name = request.user.last_name+request.user.first_name
+        user.email = request.user.email
+        user.website = ''
+        if request.session.get('avatar', None) == None:
+            try:
+                webinfo = Websiteinfo.objects.get()
+                user.uploadphoto = webinfo.photo
+            except Websiteinfo.DoesNotExist:
+                user.uploadphoto = settings.STATIC_URL + 'avatar/' + str(random.randint(1, 19)) + '.png'
+        else:
+            user.uploadphoto = request.session.get('avatar', None)
+        return user
     if request.session.get('logout', None) == True:
         user = Socialuser()
         user.name = request.session.get('name', '')
