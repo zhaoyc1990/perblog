@@ -32,10 +32,6 @@ def temp(request):
 
 #首页
 def home(request):
-    if request.user.id != None:
-        print '用户是否存在:' ,request.user.id, '用户邮箱:', request.user.email, '用户名字:', request.user.last_name+ request.user.first_name
-    else:
-        print '游客'
     user = auth_user(request)
     #网站信息
     websiteinfo = None
@@ -450,7 +446,7 @@ def message(request):
             response_data['website'] = website
             response_data['avatar'] = user.photo
             response_data['time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            aa = GuestBook.objects.create(message=content, name=name, email=email, website=website, avatar=avatar,messagerely_id= message_reply_id)
+            aa = GuestBook.objects.create(message=content, name=name, email=email, website=website, avatar=user.photo,messagerely_id= message_reply_id)
             print aa, ";;" + aa.avatar + ";;;;;;;;" + aa.message + ',website:' + website
             print  name + '留言,成功'
             return JsonResponse(response_data)
