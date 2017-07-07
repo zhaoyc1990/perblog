@@ -410,14 +410,14 @@ def articlerely(request):
                 print '游客用户回复成功'
             response_data['id'] = responder.id
             #发送邮件通知
-            # commentator = None
-            # try:
-            #     if art_rely != None:
-            #         commentator = ArticleRely.objects.get(id=art_rely)
-            # except ArticleRely.DoesNotExist:
-            #     pass
-            # mail_notice = Sendmail()
-            # mail_notice.sendmail(0,commentator, responder, artid)
+            commentator = None
+            try:
+                if art_rely != None:
+                    commentator = ArticleRely.objects.get(id=art_rely)
+            except ArticleRely.DoesNotExist:
+                pass
+            mail_notice = Sendmail()
+            mail_notice.sendmail(0,commentator, responder, artid)
             return JsonResponse(response_data)
 
     return JsonResponse({'Success': False})
@@ -486,24 +486,24 @@ def message(request):
         request.session['website'] = website
         request.session['avatar'] = avatar
         #发送邮件通知
-        # commentator = None
-        # try:
-        #     if message_reply_id != None:
-        #         commentator_guestbook = GuestBook.objects.get(id=message_reply_id)
-        #         commentator = ArticleRely()
-        #         commentator.id = commentator_guestbook.id
-        #         commentator.name = commentator_guestbook.name
-        #         commentator.email = commentator_guestbook.email
-        #         commentator.content = commentator_guestbook.message
-        # except ArticleRely.DoesNotExist:
-        #     pass
-        # mail_notice = Sendmail()
-        # if mail_notice.host != '':
-        #     responder = ArticleRely()
-        #     responder.name = responder_guestbook.name
-        #     responder.id = responder_guestbook.id
-        #     responder.content = responder_guestbook.message
-        #     mail_notice.sendmail(1, commentator, responder)
+        commentator = None
+        try:
+            if message_reply_id != None:
+                commentator_guestbook = GuestBook.objects.get(id=message_reply_id)
+                commentator = ArticleRely()
+                commentator.id = commentator_guestbook.id
+                commentator.name = commentator_guestbook.name
+                commentator.email = commentator_guestbook.email
+                commentator.content = commentator_guestbook.message
+        except ArticleRely.DoesNotExist:
+            pass
+        mail_notice = Sendmail()
+        if mail_notice.host != '':
+            responder = ArticleRely()
+            responder.name = responder_guestbook.name
+            responder.id = responder_guestbook.id
+            responder.content = responder_guestbook.message
+            mail_notice.sendmail(1, commentator, responder)
         return JsonResponse(response_data)
     return JsonResponse({'Success': False})
 
