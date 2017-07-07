@@ -69,7 +69,11 @@ layui.use(['element', 'jquery', 'form', 'layedit'], function () {
                     });
                     layer.msg("留言成功", { icon: 1 });
                 } else {
-                    layer.msg("<span style='color:#777777;'>评论失败</span>", { icon: 2 });
+                    if (typeof(res.message)!= "undefined"){
+                        layer.msg("<span style='color:#777777;'>" + res.message +"</span>", { icon: 2 });
+                    } else {
+                        layer.msg("<span style='color:#777777;'>评论失败</span>", { icon: 2 });
+                    }
                 }
             },
             beforeSend: function(xhr, settings) {
@@ -111,7 +115,12 @@ layui.use(['element', 'jquery', 'form', 'layedit'], function () {
                     $(data.form).parent('.replycontainer').before(html).siblings('.comment-parent').children('p').children('a').click();
                     layer.msg("回复成功", { icon: 1 });
                 } else {
-                    layer.msg("<span style='color:#777777;'>评论失败</span>", { icon: 2 });
+                    if (typeof(res.message)!= "undefined"){
+                        layer.msg("<span style='color:#777777;'>" + res.message +"</span>", { icon: 2 });
+                    } else {
+                        layer.msg("<span style='color:#777777;'>评论失败</span>", { icon: 2 });
+                    }
+
                 }
             },
             beforeSend: function(xhr, settings) {

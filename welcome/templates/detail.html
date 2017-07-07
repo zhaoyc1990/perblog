@@ -1,11 +1,4 @@
-﻿<!--
-    
- @Name：不落阁整站模板源码
- @Author：Absolutely
- @Site：http://www.lyblogs.cn
-
- -->
-
+﻿
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -102,9 +95,9 @@
                         <ul class="blog-comment">
                         {% for art_ry in art_rely %}
                             <li>
-                                <div class="comment-parent" id="commit_id{{ art_ry.id }}">
+                                <div class="comment-parent" id="comment-{{ art_ry.id }}">
                                     {% if art_ry.socialuser %}
-                                        <img src="{{ art_ry.socialuser.photo }}" alt="absolutely" />
+                                        <img src="{{ art_ry.socialuser.photo }}" alt="{{ art_ry.socialuser.name }}" />
                                         <div class="info">
                                         {% if art_ry.socialuser.website %}
                                             <a target="_blank" href="{{ art_ry.socialuser.website }}">
@@ -134,7 +127,7 @@
                                 </div>
                                     <hr/>
                                     {% for art_rely in art_ry.reply %}
-                                        <div class="comment-child">
+                                        <div class="comment-child" id="comment-{{ art_rely.id }}">
                                             {% if art_rely.socialuser %}
                                                 <img src="{{ art_rely.socialuser.photo }}" alt="{{ art_rely.socialuser.name }}" />
                                                 <div class="info">
@@ -174,7 +167,7 @@
 
                                         <div class="layui-input-inline user-info" style="width:50%;"><input type="text" name="email" placeholder="邮箱" value="{% if user.email %}{{ user.email }}{% else %}{% endif %}" class="layui-input"></div>
                                         <div class="layui-form-item user-info">
-                                            <input name="website"  type="text"  lay-verify="replyContent" placeholder="您的网址" value="{% if user.website %}{{ user.website }}{% else %}{% endif %}" class="layui-input" />
+                                            <input name="website"  type="text"  placeholder="您的网址" value="{% if user.website %}{{ user.website }}{% else %}{% endif %}" class="layui-input" />
                                         </div>
                                         <div class="layui-form-item">
                                             <textarea name="replyContent" lay-verify="replyContent" placeholder="请输入回复内容" class="layui-textarea" style="min-height:80px;"></textarea>

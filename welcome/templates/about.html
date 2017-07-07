@@ -186,11 +186,11 @@
                                             <ul class="blog-comment">
                                                 {% for mes in guestbook %}
                                                 <li>
-                                                    <div class="comment-parent">
+                                                    <div class="comment-parent"  id="comment-{{ mes.id }}">
                                                         <img src="{{ mes.avatar }}" alt="{{ mes.name }}" />
                                                         <div class="info">
                                                             {% if mes.website %}
-                                                                <a target="_blank" href="{{ mes.website }}"> </a>
+                                                                <a target="_blank" href="{{ mes.website }}"><span class="username">{{ mes.name }}</span> </a>
 
                                                             {% else %}
                                                                 <span class="username">{{ mes.name }}</span>
@@ -198,14 +198,14 @@
                                                         </div>
                                                         <div class="content">
                                                             {% autoescape off %}
-                                                                {{ mes.message }}
+                                                                {{ mes.message | removetags:"script html body head"}}
                                                             {% endautoescape %}
                                                         </div>
                                                         <p class="info info-footer"><span class="time">{{ mes.timestamp | date:"Y-m-j H:i" }}</span><a class="btn-reply" href="javascript:;" onclick="btnReplyClick(this)">回复</a></p>
                                                     </div>
                                                     <hr />
                                                     {% for mesch in mes.replypeople %}
-                                                        <div class="comment-child">
+                                                        <div class="comment-child"  id="comment-{{ mesch.id }}">
                                                             <img src="{{ mesch.avatar }}" alt="{{ mesch.name }}" />
                                                             <div class="info">
                                                             {% if mesch.website %}

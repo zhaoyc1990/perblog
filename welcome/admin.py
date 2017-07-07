@@ -3,6 +3,7 @@ from django.contrib import admin
 
 from .models import PageView, GuestBook, Announcement, Article, ArticleCategory, ArticleRely, AccessBy
 from .models import TimeLine, Protagonist, Websiteinfo, Links, Share, ShareCategory, Ad, Socialaccount, Socialuser
+from .models import Smtpmail
 # Register your models here.
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
@@ -21,12 +22,23 @@ class PageViewAdmin(admin.ModelAdmin):
 class AdAdmin(admin.ModelAdmin):
     list_display = ['advertisers', 'position']
 
+class SmtpmailAdmin(admin.ModelAdmin):
+    list_display = ['host', 'user', 'enabled']
+
+class ArticleRelyAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'content', 'review']
+    list_editable = ['review', ]
+
+class GuestBookAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'message', 'review']
+    list_editable = ['review', ]
+
 admin.site.register(PageView, PageViewAdmin)
-admin.site.register(GuestBook)
+admin.site.register(GuestBook, GuestBookAdmin)
 admin.site.register(Announcement)
 #admin.site.register(Article, ArticleAdmin)
 admin.site.register(ArticleCategory)
-admin.site.register(ArticleRely)
+admin.site.register(ArticleRely, ArticleRelyAdmin)
 admin.site.register(AccessBy)
 admin.site.register(TimeLine)
 admin.site.register(Protagonist)
@@ -37,3 +49,4 @@ admin.site.register(ShareCategory)
 admin.site.register(Ad, AdAdmin)
 admin.site.register(Socialaccount)
 admin.site.register(Socialuser)
+admin.site.register(Smtpmail, SmtpmailAdmin)

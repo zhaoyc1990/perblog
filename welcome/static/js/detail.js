@@ -18,9 +18,22 @@ layui.use(['form', 'layedit'], function () {
         height: 150,
         tool: ['face', '|', 'left', 'center', 'right', '|', 'link'],
     });
+    var submit_time = 0;
     //评论和留言的编辑器的验证
     layui.form().verify({
+
         content: function (value) {
+            if (Date.parse(new Date())-submit_time < 10000) {
+                return "着什么急"
+            }
+            value = $.trim(layedit.getText(editIndex));
+            if (value == "") return "自少得有一个字吧";
+            layedit.sync(editIndex);
+        },
+        replyContent: function (value) {
+            if (Date.parse(new Date())-submit_time < 10000) {
+                return "着什么急"
+            }
             value = $.trim(layedit.getText(editIndex));
             if (value == "") return "自少得有一个字吧";
             layedit.sync(editIndex);
@@ -29,7 +42,7 @@ layui.use(['form', 'layedit'], function () {
     //监听评论提交
     form.on('submit(formRemark)', function (data) {
         var index = layer.load(1);
-        var artid = $("#artid").text()
+        var artid = $("#artid").text();
         var name = data.field.name;
         var email = data.field.email;
         var website = data.field.website;
@@ -45,7 +58,11 @@ layui.use(['form', 'layedit'], function () {
                 if (res.Success) {
                     formadd( data.field.editorContent,res)
                 } else {
-                    layer.msg('评论失败', { icon: 2 });
+                    if (typeof(res.message)!= "undefined"){
+                        layer.msg("<span style='color:#777777;'>" + res.message +"</span>", { icon: 2 });
+                    } else {
+                        layer.msg("<span style='color:#777777;'>评论失败</span>", { icon: 2 });
+                    }
                 }
             },
             beforeSend: function(xhr, settings) {
@@ -82,6 +99,7 @@ layui.use(['form', 'layedit'], function () {
     //监听留言回复提交
     form.on('submit(formReply)', function (data) {
         var index = layer.load(1);
+        var artid = $("#artid").text();
         var art_reply_id = data.field.replyid;
         var message = data.field.replyContent;
         var name = data.field.username;
@@ -91,7 +109,7 @@ layui.use(['form', 'layedit'], function () {
             type: 'post',
             url: '/api/article/rely',
             contentType: 'application/json',
-            data: JSON.stringify({ "art_rely": art_reply_id, "content": message, "name": name, "email": email, "website": website, "artid":0}),
+            data: JSON.stringify({ "art_rely": art_reply_id, "content": message, "name": name, "email": email, "website": website, "artid":artid}),
             datatype: 'json',
             success: function (res) {
                 layer.close(index);
@@ -108,7 +126,11 @@ layui.use(['form', 'layedit'], function () {
                     $(data.form).parent('.replycontainer').before(html).siblings('.comment-parent').children('p').children('a').click();
                     layer.msg("回复成功", { icon: 1 });
                 } else {
-                    layer.msg("<span style='color:#777777;'>评论失败</span>", { icon: 2 });
+                    if (typeof(res.message)!= "undefined"){
+                        layer.msg("<span style='color:#777777;'>" + res.message +"</span>", { icon: 2 });
+                    } else {
+                        layer.msg("<span style='color:#777777;'>评论失败</span>", { icon: 2 });
+                    }
                 }
             },
             beforeSend: function(xhr, settings) {

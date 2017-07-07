@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^timeline.html', timeline),
     url(r'^about', about),
     url(r'^share', share),
-    url(r'^detail/(?P<aid>\d+).html/$', detail),
+    url(r'^detail/(?P<aid>\d+).html$', detail),
     url(r'^api/article/next', homenext),
     url(r'^api/article/rely', articlerely),
     url(r'^api/message', message),

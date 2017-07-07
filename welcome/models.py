@@ -31,6 +31,11 @@ class GuestBook(models.Model):
 		return self.name
 	def replypeople(self):
 		return self.relymessage.all()
+	def save(self, *args, **kwargs):
+		self.website = self.website.strip()
+		if self.website[:7] != 'http://' and self.website[:8] != 'https://' and self.website != '':
+			self.website = 'http://' + self.website
+		super(GuestBook, self).save(*args, **kwargs)
 	class Meta:
 		verbose_name_plural = verbose_name = '网站留言'
 
@@ -163,7 +168,7 @@ class ArticleRely(models.Model):
 	socialuser = models.ForeignKey(Socialuser, related_name='relyuser', verbose_name='社交用户', blank=True, null=True)
 	commentip = models.ForeignKey(AccessBy, related_name='artrely', verbose_name='回复ip', blank=True, null=True)
 	photo = models.CharField('随机头像',max_length=100, blank=True, null=True)
-	name = models.CharField('评论者名称', max_length=50)  # 评论者名称
+	name = models.CharField('评论者名称', max_length=50, blank=True, null=True)  # 评论者名称
 	email = models.CharField('评论者邮箱', max_length=80, blank=True, null=True)
 	website = models.CharField('评论者网站', max_length=100, blank=True, null=True)
 	content = models.TextField('评论内容', max_length=500)
@@ -176,7 +181,13 @@ class ArticleRely(models.Model):
 	def __str__(self):
 		return self.name
 	def reply(self):
-		return self.arirely.all()
+		return self.arirely.filter(review=True).all()
+
+	def save(self, *args, **kwargs):
+		self.website = self.website.strip()
+		if self.website[:7] != 'http://' and self.website[:8] != 'https://' and self.website != '':
+			self.website = 'http://' + self.website
+		super(ArticleRely, self).save(*args, **kwargs)
 	class Meta:
 		verbose_name_plural = verbose_name = '文章评论及评论回复'
 
@@ -276,6 +287,11 @@ class Websiteinfo(models.Model):
 		return self.title
 	def __str__(self):
 		return self.title
+	def save(self, *args, **kwargs):
+		self.websiteip = self.websiteip.strip()
+		if self.websiteip[:7] != 'http://' and self.websiteip[:8] != 'https://' and self.websiteip != '':
+			self.website = 'http://' + self.websiteip
+		super(Websiteinfo, self).save(*args, **kwargs)
 	class Meta:
 		verbose_name_plural = verbose_name = '网站信息'
 
@@ -308,3 +324,17 @@ class Ad(models.Model):
 	class Meta:
 		verbose_name_plural = verbose_name = '广告代码'
 
+#发送邮箱服务器配置
+class Smtpmail(models.Model):
+	host = models.CharField('STMP服务器域名:', max_length=50)
+	port = models.IntegerField('STMP服务端口:')
+	user = models.EmailField('邮箱用户名:')
+	password = models.CharField('邮箱密码:', max_length=100)
+	tls = models.BooleanField('是否需要开启tls', default=False)
+	enabled = models.BooleanField('是否启用该邮箱', default=True)
+	def __unicode__(self):
+		return self.user
+	def __str__(self):
+		return self.user
+	class Meta:
+		verbose_name_plural = verbose_name = '发送邮箱服务器配置'
