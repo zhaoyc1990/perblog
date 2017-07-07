@@ -359,7 +359,7 @@ def articlerely(request):
             name = req_data['name']
             email = req_data['email']
             website = req_data.get('website', None)
-            if email.strip() == '':
+            if email.strip() == ''or content.strip() == '':
                 raise  KeyError
         except KeyError:  # 获取数据 不完整时 ，返回错误
             return JsonResponse({'Success': False, 'message': u'你是否漏了什么重要的东西'})
@@ -408,16 +408,16 @@ def articlerely(request):
                 responder = ArticleRely.objects.create(content=content, artid=art, name=name, email=email, website=website,
                                            photo=response_data['avatar'], commentid_id=art_rely)
                 print '游客用户回复成功'
-
+            response_data['id'] = responder.id
             #发送邮件通知
-            commentator = None
-            try:
-                if art_rely != None:
-                    commentator = ArticleRely.objects.get(id=art_rely)
-            except ArticleRely.DoesNotExist:
-                pass
-            mail_notice = Sendmail()
-            mail_notice.sendmail(0,commentator, responder, artid    )
+            # commentator = None
+            # try:
+            #     if art_rely != None:
+            #         commentator = ArticleRely.objects.get(id=art_rely)
+            # except ArticleRely.DoesNotExist:
+            #     pass
+            # mail_notice = Sendmail()
+            # mail_notice.sendmail(0,commentator, responder, artid)
             return JsonResponse(response_data)
 
     return JsonResponse({'Success': False})
@@ -434,7 +434,7 @@ def message(request):
             content = req_data['content']
             email = req_data['email']
             website = req_data.get('website', None)
-            if email.strip() == u'':
+            if email.strip() == '' or content.strip() == '':
                 raise  KeyError
         except KeyError:  # 获取数据 不完整时 ，返回错误
             print '网站留言，提交数据不完整', req_data
@@ -474,6 +474,7 @@ def message(request):
         print name + '留言,成功,回复ID:', message_reply_id
         response_data = {}
         response_data['Success'] = True
+        response_data['id'] = responder_guestbook.id
         response_data['name'] = name
         response_data['email'] = email
         response_data['website'] = website
@@ -485,24 +486,24 @@ def message(request):
         request.session['website'] = website
         request.session['avatar'] = avatar
         #发送邮件通知
-        commentator = None
-        try:
-            if message_reply_id != None:
-                commentator_guestbook = GuestBook.objects.get(id=message_reply_id)
-                commentator = ArticleRely()
-                commentator.id = commentator_guestbook.id
-                commentator.name = commentator_guestbook.name
-                commentator.email = commentator_guestbook.email
-                commentator.content = commentator_guestbook.message
-        except ArticleRely.DoesNotExist:
-            pass
-        mail_notice = Sendmail()
-        if mail_notice.host != '':
-            responder = ArticleRely()
-            responder.name = responder_guestbook.name
-            responder.id = responder_guestbook.id
-            responder.content = responder_guestbook.message
-            mail_notice.sendmail(1, commentator, responder)
+        # commentator = None
+        # try:
+        #     if message_reply_id != None:
+        #         commentator_guestbook = GuestBook.objects.get(id=message_reply_id)
+        #         commentator = ArticleRely()
+        #         commentator.id = commentator_guestbook.id
+        #         commentator.name = commentator_guestbook.name
+        #         commentator.email = commentator_guestbook.email
+        #         commentator.content = commentator_guestbook.message
+        # except ArticleRely.DoesNotExist:
+        #     pass
+        # mail_notice = Sendmail()
+        # if mail_notice.host != '':
+        #     responder = ArticleRely()
+        #     responder.name = responder_guestbook.name
+        #     responder.id = responder_guestbook.id
+        #     responder.content = responder_guestbook.message
+        #     mail_notice.sendmail(1, commentator, responder)
         return JsonResponse(response_data)
     return JsonResponse({'Success': False})
 

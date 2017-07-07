@@ -18,11 +18,21 @@ layui.use(['element', 'jquery', 'form', 'layedit'], function () {
         height: 150,
         tool: ['face', '|', 'left', 'center', 'right', '|', 'link'],
     });
+    var submit_time = 0;
     //评论和留言的编辑器的验证
     layui.form().verify({
+
         content: function (value) {
             value = $.trim(layedit.getText(editIndex));
             if (value == "") return "自少得有一个字吧";
+            layedit.sync(editIndex);
+        },
+        replyContent: function (value) {
+            if (Date.parse(new Date())-submit_time < 10000) {
+                return "着什么急"
+            }
+            if (value=="") return "自少得有一个字吧";
+            value = $.trim(layedit.getText(editIndex));
             layedit.sync(editIndex);
         }
     });
@@ -55,10 +65,10 @@ layui.use(['element', 'jquery', 'form', 'layedit'], function () {
                 layer.close(index);
                 if (res.Success) {
                     if( res.website == "") {
-                        var html = '<li><div class="comment-parent"><i style="display:none">' + res.id + '</i><img src="' + res.avatar + '"alt="模拟留言"/><div class="info"><span class="username">' + res.name + '</span></div><div class="content">' + message + '</div><p class="info info-footer"><span class="time">'+ res.time + '</span><a class="btn-reply"href="javascript:;" onclick="btnReplyClick(this)">回复</a></p></div><!--回复表单默认隐藏--><div class="replycontainer layui-hide"><form class="layui-form"action=""><div class="layui-form-item"><textarea name="replyContent"lay-verify="replyContent"placeholder="请输入回复内容"class="layui-textarea"style="min-height:80px;"></textarea></div><div class="layui-form-item"><button class="layui-btn layui-btn-mini"lay-submit="formReply"lay-filter="formReply">提交</button></div></form></div></li>';
+                        var html = '<li><div class="comment-parent" id="comment-'+ res.id +'"><img src="' + res.avatar + '"alt="模拟留言"/><div class="info"><span class="username">' + res.name + '</span></div><div class="content">' + message + '</div><p class="info"><span style="color:#BBBBBB;">您的留言，将在博主审核后，出现在这里</span></p><p class="info info-footer"><span class="time">'+ res.time + '</span><a class="btn-reply"href="javascript:;" onclick="btnReplyClick(this)">回复</a></p></div></li>';
 
                     } else {
-                        var html = '<li><div class="comment-parent"><i style="display:none">' + res.id + '</i><img src="' + res.avatar + '"alt="模拟留言"/><div class="info"><a target="_blank" href="' + res.website + '"><span class="username">' + res.name + '</span></a></div><div class="content">' + message + '</div><p class="info info-footer"><span class="time">'+ res.time + '</span><a class="btn-reply"href="javascript:;" onclick="btnReplyClick(this)">回复</a></p></div><!--回复表单默认隐藏--><div class="replycontainer layui-hide"><form class="layui-form"action=""><div class="layui-form-item"><textarea name="replyContent"lay-verify="replyContent"placeholder="请输入回复内容"class="layui-textarea"style="min-height:80px;"></textarea></div><div class="layui-form-item"><button class="layui-btn layui-btn-mini"lay-submit="formReply"lay-filter="formReply">提交</button></div></form></div></li>';
+                        var html = '<li><div class="comment-parent" id="comment-'+ res.id +'"><img src="' + res.avatar + '"alt="模拟留言"/><div class="info"><a target="_blank" href="' + res.website + '"><span class="username">' + res.name + '</span></a></div><div class="content">' + message + '</div><p class="info"><span style="color:#BBBBBB;">您的留言，将在博主审核后，出现在这里</span></p><p class="info info-footer"><span class="time">'+ res.time + '</span><a class="btn-reply"href="javascript:;" onclick="btnReplyClick(this)">回复</a></p></div></li>';
 
                     }
                     $('.blog-comment').append(html);
@@ -68,6 +78,9 @@ layui.use(['element', 'jquery', 'form', 'layedit'], function () {
                         tool: ['face', '|', 'left', 'center', 'right', '|', 'link'],
                     });
                     layer.msg("留言成功", { icon: 1 });
+                    location.hash="#comment-" + res.id;
+                    topindex = $(document).scrollTop();
+                    $(document).scrollTop(topindex-70);
                 } else {
                     if (typeof(res.message)!= "undefined"){
                         layer.msg("<span style='color:#777777;'>" + res.message +"</span>", { icon: 2 });
@@ -104,16 +117,19 @@ layui.use(['element', 'jquery', 'form', 'layedit'], function () {
                 layer.close(index);
                 if (res.Success) {
                     if (res.website == ""){
-                        var html = '<div class="comment-child"><img src="' + res.avatar +'"alt="Absolutely"/><div class="info"><span class="username">' + res.name + '</span><span>' + message + '</span></div><p class="info"><span class="time">'+ res.time + '</span></p></div>';
+                        var html = '<div class="comment-child" id="comment-'+ res.id +'"><img src="' + res.avatar +'"alt="Absolutely"/><div class="info"><span class="username">' + res.name + '</span><span>' + message + '</span></div><p class="info"><span style="color:#BBBBBB;">您的回复，将在博主审核后，出现在这里</span></p><p class="info"><span class="time">'+ res.time + '</span></p></div>';
 
                     } else {
-                        var html = '<div class="comment-child"><img src="' + res.avatar +'"alt="Absolutely"/><div class="info"><a target="_blank" href="' + res.website +'" <span class="username">' + res.name + '</span></a><span>' + message + '</span></div><p class="info"><span class="time">'+ res.time + '</span></p></div>';
+                        var html = '<div class="comment-child" id="comment-'+ res.id +'"><img src="' + res.avatar +'"alt="Absolutely"/><div class="info"><a target="_blank" href="' + res.website +'" <span class="username">' + res.name + '</span></a><span>' + message + '</span></div><p class="info"><span style="color:#BBBBBB;">您的回复，将在博主审核后，出现在这里</span></p><p class="info"><span class="time">'+ res.time + '</span></p></div>';
 
                     }
                     $(data.form).find('textarea').val('');
                     $(data.form).find('.user-info').val('');
                     $(data.form).parent('.replycontainer').before(html).siblings('.comment-parent').children('p').children('a').click();
                     layer.msg("回复成功", { icon: 1 });
+                    location.hash="#comment-" + res.id;
+                    topindex = $(document).scrollTop();
+                    $(document).scrollTop(topindex-70);
                 } else {
                     if (typeof(res.message)!= "undefined"){
                         layer.msg("<span style='color:#777777;'>" + res.message +"</span>", { icon: 2 });

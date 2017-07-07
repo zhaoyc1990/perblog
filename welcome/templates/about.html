@@ -228,7 +228,7 @@
 
                                                             <div class="layui-input-inline user-info" style="width:50%;"><input type="text" name="email" placeholder="邮箱" value="{% if user.email %}{{ user.email }}{% else %}{% endif %}" class="layui-input"></div>
                                                             <div class="layui-form-item user-info">
-                                                                <input name="website"  type="text"  lay-verify="replyContent" placeholder="您的网址" value="{% if user.website %}{{ user.website }}{% else %}{% endif %}" class="layui-input" />
+                                                                <input name="website"  type="text"  lay-verify="" placeholder="您的网址" value="{% if user.website %}{{ user.website }}{% else %}{% endif %}" class="layui-input" />
                                                             </div>
                                                             <div class="layui-form-item">
                                                                 <textarea name="replyContent" lay-verify="replyContent" placeholder="请输入回复内容" class="layui-textarea" style="min-height:80px;"></textarea>

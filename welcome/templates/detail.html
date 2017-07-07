@@ -95,7 +95,7 @@
                         <ul class="blog-comment">
                         {% for art_ry in art_rely %}
                             <li>
-                                <div class="comment-parent" id="comment-{{ art_ry.id }}">
+                                <div class="comment-parent" id="comment-{{ art_ry.id }}" style="padding-top:100px;margin-top:-100px;">
                                     {% if art_ry.socialuser %}
                                         <img src="{{ art_ry.socialuser.photo }}" alt="{{ art_ry.socialuser.name }}" />
                                         <div class="info">
@@ -106,7 +106,6 @@
                                         {% else %}
                                              <span class="username">{{ art_ry.socialuser.name }}</span>
                                         {% endif %}
-                                            <span class="time">{{ art_ry.timemodify }}</span>
                                         </div>
                                     {% else %}
                                         <img src="{{ art_ry.photo }}" alt="{{ art_ry.name }}" />
@@ -114,7 +113,6 @@
                                         <a target="_blank" href="{{ art_ry.website }}">
                                             <span class="username">{{ art_ry.name }}</span>
                                         </a>
-                                            <span class="time">{{ art_ry.timemodify }}</span>
                                         </div>
                                     {% endif %}
 
@@ -123,7 +121,7 @@
                                             {{ art_ry.content }}
                                         {% endautoescape %}
                                     </div>
-                                    <p class="info info-footer"><span class="time">{{ mes.timestamp | date:"Y-m-j H:i" }}</span><a class="btn-reply" href="javascript:;" onclick="btnReplyClick(this)">回复</a></p>
+                                    <p class="info info-footer"><span class="time">{{ art_ry.timestamp | date:"Y-m-j H:i" }}</span><a class="btn-reply" href="javascript:;" onclick="btnReplyClick(this)">回复</a></p>
                                 </div>
                                     <hr/>
                                     {% for art_rely in art_ry.reply %}
@@ -133,22 +131,20 @@
                                                 <div class="info">
                                                 {% if art_rely.socialuser.website %}
                                                     <a target="_blank" href="{{ art_rely.socialuser.website }}">
-                                                        <span class="username">{{ art_rely.socialuser.name }}</span>
+                                                        <span class="username">{{ art_rely.socialuser.name }}</span><span>回复</span>
                                                     </a>
                                                 {% else %}
-                                                     <span class="username">{{ art_rely.socialuser.name }}</span>
+                                                     <span class="username">{{ art_rely.socialuser.name }}</span><span>回复</span>
                                                 {% endif %}
-                                                    <span class="time">{{ art_rely.timemodify }}</span>
                                                 </div>
                                             {% else %}
                                                 <img src="{{ art_rely.photo }}" alt="{{ art_rely.name }}" />
                                                 <div class="info">
                                                 {% if art_rely.website %}
-                                                    <a target="_blank" href="{{ art_rely.website }}"><span class="username">{{ art_rely.name }}</span></a>
+                                                    <a target="_blank" href="{{ art_rely.website }}"><span class="username">{{ art_rely.name }}</span></a><span>回复</span>
                                                 {% else %}
-                                                    <span class="username">{{ art_rely.name }}</span>
+                                                    <span class="username">{{ art_rely.name }}</span><span>回复</span>
                                                 {% endif %}
-                                                    <span class="time">{{ art_ry.timestamp }}</span>
                                                 </div>
                                             {% endif %}
                                                 <div class="content">
@@ -156,6 +152,7 @@
                                                         {{ art_rely.content }}
                                                     {% endautoescape %}</span>
                                                 </div>
+                                                <span class="time">{{ art_ry.timestamp | date:"Y-m-d H:i" }}</span>
                                         </div>
 
                                     {% endfor %}

@@ -32,9 +32,10 @@ class GuestBook(models.Model):
 	def replypeople(self):
 		return self.relymessage.all()
 	def save(self, *args, **kwargs):
-		self.website = self.website.strip()
-		if self.website[:7] != 'http://' and self.website[:8] != 'https://' and self.website != '':
-			self.website = 'http://' + self.website
+		if self.website != None:
+			self.website = self.website.strip()
+			if self.website[:7] != 'http://' and self.website[:8] != 'https://' and self.website != '':
+				self.website = 'http://' + self.website
 		super(GuestBook, self).save(*args, **kwargs)
 	class Meta:
 		verbose_name_plural = verbose_name = '网站留言'
@@ -184,9 +185,10 @@ class ArticleRely(models.Model):
 		return self.arirely.filter(review=True).all()
 
 	def save(self, *args, **kwargs):
-		self.website = self.website.strip()
-		if self.website[:7] != 'http://' and self.website[:8] != 'https://' and self.website != '':
-			self.website = 'http://' + self.website
+		if self.website != None:
+			self.website = self.website.strip()
+			if self.website[:7] != 'http://' and self.website[:8] != 'https://' and self.website != '':
+				self.website = 'http://' + self.website
 		super(ArticleRely, self).save(*args, **kwargs)
 	class Meta:
 		verbose_name_plural = verbose_name = '文章评论及评论回复'
