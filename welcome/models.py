@@ -22,6 +22,7 @@ class GuestBook(models.Model):
 	message = models.TextField('留言内容', max_length=500)
 	website = models.CharField('网站地址', max_length=200,blank=True, null=True)
 	review = models.BooleanField('是否审核通过', default=False)
+	emailsend = models.BooleanField('邮箱是否发送成功', default=False)
 	timemodify = models.DateTimeField(auto_now=True)    #修改时间
 	timestamp = models.DateTimeField(auto_now_add=True)	#创建时间
 
@@ -30,7 +31,7 @@ class GuestBook(models.Model):
 	def __str__(self):
 		return self.name
 	def replypeople(self):
-		return self.relymessage.all()
+		return self.relymessage.filter(review=True)
 	def save(self, *args, **kwargs):
 		if self.website != None:
 			self.website = self.website.strip()
@@ -88,6 +89,7 @@ class Article(models.Model):
 	relycount = models.PositiveIntegerField('回复量', default=0) #临时字段不需要数据库操作
 	isstick   = models.IntegerField('是否顶置',default=0) #0为普通, 1为置顶
 	stickposition = models.IntegerField('置顶位置',default=0) #以十的余数,最多十个置顶
+	published = models.BooleanField('是否发布', default=True)
 	timemodify = models.DateTimeField(auto_now=True)  # 修改时间
 	timestamp = models.DateTimeField(auto_now_add=True)  # 创建时间
 	def __unicode__(self):
@@ -174,13 +176,22 @@ class ArticleRely(models.Model):
 	website = models.CharField('评论者网站', max_length=100, blank=True, null=True)
 	content = models.TextField('评论内容', max_length=500)
 	review = models.BooleanField('是否审核通过', default=False)
+	emailsend = models.BooleanField('邮箱是否发送成功', default=False)
 	timemodify = models.DateTimeField(auto_now=True)  # 修改时间
 	timestamp = models.DateTimeField(auto_now_add=True)  # 创建时间
 
 	def __unicode__(self):
-		return self.name
+		return unicode(self.name)
 	def __str__(self):
 		return self.name
+	def getname(self):
+		if self.name == None or self.name == '':
+			if self.socialuser != None:
+				return '【社交用户】'+self.socialuser.name
+			else:
+				return ''
+		else:
+			return '【游客】'+self.name
 	def reply(self):
 		return self.arirely.filter(review=True).all()
 

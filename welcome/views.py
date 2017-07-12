@@ -55,7 +55,7 @@ def home(request):
     print '热门排行', len(hot_art)
     #顶置的文章
     tmp_topart = []
-    topart = Article.objects.filter(isstick=1)
+    topart = Article.objects.filter(isstick=1).filter(published=True)
     for art in topart:
         art.relycount = art.artrely.filter(review=True).count()
         if art.stickposition > len(tmp_topart):
@@ -63,7 +63,7 @@ def home(request):
         else:
             tmp_topart.insert(art.stickposition, art)
     #普通文章按时间顺序
-    articles = Article.objects.filter(isstick=0).order_by('-timestamp')[0:7]
+    articles = Article.objects.filter(isstick=0).filter(published=True).order_by('-timestamp')[0:7]
     for art in articles:
         print art.artrely.count()
         art.relycount = art.artrely.filter(review=True).count()
@@ -105,7 +105,7 @@ def article(request):
     ads = Ad.objects.all()
     # 顶置的文章
     tmp_topart = []
-    topart = Article.objects.filter(isstick=1)
+    topart = Article.objects.filter(isstick=1).filter(published=True)
     for art in topart:
         art.relycount = art.artrely.filter(review=True).count()
         if art.stickposition > len(tmp_topart):
@@ -113,7 +113,7 @@ def article(request):
         else:
             tmp_topart.insert(art.stickposition, art)
     # 普通文章按时间顺序
-    articles = Article.objects.filter(isstick=0).order_by('-timestamp')[0:7]
+    articles = Article.objects.filter(isstick=0).filter(published=True).order_by('-timestamp')[0:7]
     for art in articles:
         print art.artrely.count()
         art.relycount = art.artrely.filter(review=True).count()
@@ -141,22 +141,22 @@ def article(request):
             # 类似文章
             taglist = arttagstolist(keywords)
             if len(taglist) == 1:
-                art_like = Article.objects.filter(title__contains=taglist[0])
+                art_like = Article.objects.filter(title__contains=taglist[0]).filter(published=True)
             elif len(taglist) == 2:
-                art_like = Article.objects.filter(Q(title__contains=taglist[0]) | Q(title__contains=taglist[1]))
+                art_like = Article.objects.filter(published=True).filter(Q(title__contains=taglist[0]) | Q(title__contains=taglist[1]))
             elif len(taglist) == 3:
-                art_like = Article.objects.filter(
+                art_like = Article.objects.filter(published=True).filter(
                     Q(title__contains=taglist[0]) | Q(title__contains=taglist[1]) | Q(title__contains=taglist[2]))
             elif len(taglist) == 4:
-                art_like = Article.objects.filter(
+                art_like = Article.objects.filter(published=True).filter(
                     Q(title__contains=taglist[0]) | Q(title__contains=taglist[1]) | Q(title__contains=taglist[2]) | Q(
                         title__contains=taglist[3]))
             elif len(taglist) == 5:  # 最多支持五个标签模糊查找 类似文章
-                art_like = Article.objects.filter(
+                art_like = Article.objects.filter(published=True).filter(
                     Q(title__contains=taglist[0]) | Q(title__contains=taglist[1]) | Q(title__contains=taglist[2]) | Q(
                         title__contains=taglist[3]) | Q(title__contains=taglist[4]))
             else:
-                art_like = Article.objects.filter(title__contains=art.title).values('id', 'title')
+                art_like = Article.objects.filter(published=True).filter(title__contains=art.title).values('id', 'title')
             if art_like :
                 for art in art_like:
                     print art.artrely.count()
@@ -331,8 +331,8 @@ def homenext(request):
             start = (currentIndex-1)*pagesize
             end = currentIndex*pagesize
         print "currentIndex", currentIndex
-        art = Article.objects.filter(isstick=0).order_by('-timestamp')[start:end]
-        art_count = Article.objects.filter(isstick=0).count()
+        art = Article.objects.filter(isstick=0).filter(published=True).order_by('-timestamp')[start:end]
+        art_count = Article.objects.filter(isstick=0).filter(published=True).count()
         if art_count%pagesize != 0:
             art_count = art_count/pagesize+ 1
         else:
@@ -409,15 +409,15 @@ def articlerely(request):
                                            photo=response_data['avatar'], commentid_id=art_rely)
                 print '游客用户回复成功'
             response_data['id'] = responder.id
-            #发送邮件通知
-            commentator = None
+            #发送邮件通知 只在给文章留言时发送,给其它人留言需要审核后，发送邮件
             try:
-                if art_rely != None:
-                    commentator = ArticleRely.objects.get(id=art_rely)
-            except ArticleRely.DoesNotExist:
-                pass
-            mail_notice = Sendmail()
-            mail_notice.sendmail(0,commentator, responder, artid)
+                if art_rely == None:
+                    mail_notice = Sendmail()
+                    if mail_notice.sendmail(0,None, responder, artid):
+                        responder.emailsend = True
+                        responder.save()
+            except Exception, e:
+                print u'邮件发送失败：'+e
             return JsonResponse(response_data)
 
     return JsonResponse({'Success': False})
@@ -488,22 +488,15 @@ def message(request):
         #发送邮件通知
         commentator = None
         try:
-            if message_reply_id != None:
-                commentator_guestbook = GuestBook.objects.get(id=message_reply_id)
-                commentator = ArticleRely()
-                commentator.id = commentator_guestbook.id
-                commentator.name = commentator_guestbook.name
-                commentator.email = commentator_guestbook.email
-                commentator.content = commentator_guestbook.message
-        except ArticleRely.DoesNotExist:
-            pass
-        mail_notice = Sendmail()
-        if mail_notice.host != '':
-            responder = ArticleRely()
-            responder.name = responder_guestbook.name
-            responder.id = responder_guestbook.id
-            responder.content = responder_guestbook.message
-            mail_notice.sendmail(1, commentator, responder)
+            if message_reply_id == None:
+                responder = ArticleRely()
+                responder.name = responder_guestbook.name
+                responder.id = responder_guestbook.id
+                responder.content = responder_guestbook.message
+                mail_notice = Sendmail()
+                mail_notice.sendmail(1, commentator, responder)
+        except Exception, e:
+            print u'【留言】发送邮件失败:' + e
         return JsonResponse(response_data)
     return JsonResponse({'Success': False})
 

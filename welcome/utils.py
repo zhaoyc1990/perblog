@@ -1,8 +1,15 @@
 # coding=utf-8
 from project import settings
+from models import Ad
 import time
 def articlecode(article):
-    artjson_data = ""
+    ad = None
+    artjson_data = ''
+    try:
+        ad = Ad.objects.get(position='top')
+        artjson_data = '<div class="article shadow" >' + ad.content + '</div>'
+    except Ad.DoesNotExist:
+        pass
     for art in article:
         t2 = str(art.timemodify)[0:19]
         t1 = time.strptime(t2,'%Y-%m-%d %H:%M:%S')

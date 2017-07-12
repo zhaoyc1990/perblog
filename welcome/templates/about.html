@@ -214,7 +214,7 @@
                                                                 <span class="username">{{ mesch.name }}</span>
                                                             {% endif %}
                                                                 <span>{% autoescape off %}
-                                                                {{ mesch.message }}
+                                                                {{ mesch.message  | removetags:"script html body head"}}
                                                             {% endautoescape %}</span>
                                                             </div>
                                                             <p class="info"><span class="time">{{ mesch.timestamp | date:"Y-m-j H:i" }}</span></p>

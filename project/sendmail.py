@@ -78,11 +78,9 @@ class Sendmail:
             msg['To'] = self._format_addr(unicode(commentator.name + ' <'+ commentator.email +'>'))
             msg['Subject'] = Header(unicode('您在【'+ webinfo.title +'】的' + anchor_point[1] + '收到了回复'), 'utf-8').encode()
             to_addr = commentator.email
-        smtp = smtplib.SMTP(self.host, self.port)
+        smtp = smtplib.SMTP_SSL(self.host, self.port)
         smtp.set_debuglevel(1)
-        if self.tls:
-            smtp.ehlo()
-            smtp.starttls()
+        smtp.ehlo()
         try:
             smtp.login(self.mail_username, self.mail_password)
         except:
