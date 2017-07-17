@@ -227,7 +227,7 @@ def detail(request, aid):
     #文章回复量
     art = Article.objects.get(id=aid)
     #文章回复
-    art_rely = ArticleRely.objects.filter(artid=aid).filter(review=True)
+    art_rely = ArticleRely.objects.filter(artid=aid).filter(review=True).filter(commentid=None)
     print '文章回复:', art_rely
     # 类似文章
     taglist = arttagstolist(art.tags)
@@ -494,7 +494,9 @@ def message(request):
                 responder.id = responder_guestbook.id
                 responder.content = responder_guestbook.message
                 mail_notice = Sendmail()
-                mail_notice.sendmail(1, commentator, responder)
+                if mail_notice.sendmail(1, commentator, responder):
+                    responder_guestbook.emailsend = True
+                    responder_guestbook.save()
         except Exception, e:
             print u'【留言】发送邮件失败:' + e
         return JsonResponse(response_data)

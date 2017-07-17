@@ -183,7 +183,13 @@ class ArticleRely(models.Model):
 	def __unicode__(self):
 		return unicode(self.name)
 	def __str__(self):
-		return self.name
+		if self.name == None or self.name == '':
+			if self.socialuser != None:
+				return self.socialuser.name
+			else:
+				return ''
+		else:
+			return self.name
 	def getname(self):
 		if self.name == None or self.name == '':
 			if self.socialuser != None:

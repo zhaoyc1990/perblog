@@ -110,9 +110,13 @@
                                     {% else %}
                                         <img src="{{ art_ry.photo }}" alt="{{ art_ry.name }}" />
                                         <div class="info">
-                                        <a target="_blank" href="{{ art_ry.website }}">
+                                        {% if art_ry.website %}
+                                            <a target="_blank" href="{{ art_ry.website }}">
+                                                <span class="username">{{ art_ry.name }}</span>
+                                            </a>
+                                        {% else %}
                                             <span class="username">{{ art_ry.name }}</span>
-                                        </a>
+                                        {% endif %}
                                         </div>
                                     {% endif %}
 
