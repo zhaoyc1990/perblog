@@ -11,6 +11,7 @@ def articlecode(article):
     except Ad.DoesNotExist:
         pass
     for art in article:
+        art.relycount = art.artrely.filter(review=True).filter(commentid=None).count()
         t2 = str(art.timemodify)[0:19]
         t1 = time.strptime(t2,'%Y-%m-%d %H:%M:%S')
         t = list(t1)

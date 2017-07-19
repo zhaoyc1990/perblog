@@ -5,6 +5,7 @@ from .models import PageView, GuestBook, Announcement, Article, ArticleCategory,
 from .models import TimeLine, Protagonist, Websiteinfo, Links, Share, ShareCategory, Ad, Socialaccount, Socialuser
 from .models import Smtpmail
 from project.sendmail import Sendmail
+from django.contrib import messages
 # Register your models here.
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
@@ -30,11 +31,13 @@ class ArticleRelyAdmin(admin.ModelAdmin):
     list_display = ['getname', 'email', 'content', 'review', 'emailsend', 'timestamp']
     actions = ['make_review']
     def make_review(self, request, queryset):
+        msg = ''
         for rely in queryset:
             print rely
             #如果是给博主留言就pass
             if rely.commentid == None:
                 rely.review = True
+
             else:
                 try:
                     if rely.socialuser != None:
@@ -44,14 +47,18 @@ class ArticleRelyAdmin(admin.ModelAdmin):
                         rely.commentid.name = rely.commentid.socialuser.name
                         rely.commentid.emal = rely.commentid.socialuser.email
                     mail_notice = Sendmail()
-                    if mail_notice.sendmail(0, rely.commentid, rely, rely.artid.id):
+                    if mail_notice.sendmail(0, rely.commentid, rely, rely.commentid.artid.id):
                         rely.emailsend = True
                     else:
-                        print u'留言邮件没发送成功'
+                        msg =  u'留言邮件没发送成功'
                 except Exception, e:
-                    print  u'留言邮件没发送成功:', e
+                    msg =  u'留言邮件没发送成功:', e
                 rely.review = True
             rely.save()
+        if msg:
+            messages.add_message(request, messages.ERROR, msg)
+        else:
+            messages.add_message(request, messages.SUCCESS, u'已审核通过，并发送邮件通知')
     make_review.short_description = "审核通过"
 
 class GuestBookAdmin(admin.ModelAdmin):
